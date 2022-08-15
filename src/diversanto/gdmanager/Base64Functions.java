@@ -4,7 +4,7 @@ import java.util.Base64;
 
 public class Base64Functions {
     public static byte[] base64URLDecode(byte[] bytes) {
-        return Base64.getMimeDecoder().decode(URLToBase64(trimBase64URL(bytes)));
+        return Base64.getDecoder().decode(URLToBase64(trimBase64URL(bytes)));
     }
 
     public static byte[] base64URLDecode(String encoded) {

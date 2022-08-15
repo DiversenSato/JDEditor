@@ -6,10 +6,11 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
+import java.util.zip.DataFormatException;
 
 public class Main {
-    public static void main(String[] args) throws IOException, NoSuchLevelException {
-        GDManager gdManager = new GDManager("C:/Users/Daniel/AppData/Local/GeometryDash/CCLocalLevels.dat");
+    public static void main(String[] args) throws IOException, NoSuchLevelException, DataFormatException {
+        GDManager gdManager = new GDManager("C:/Users/diver/AppData/Local/GeometryDash/CCLocalLevels.dat");
 //
 //        String data = gdManager.getLevel("level name").data;
 //        System.out.println(data);
