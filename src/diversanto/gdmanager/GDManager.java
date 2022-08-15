@@ -19,17 +19,20 @@ import java.util.zip.*;
 import static diversanto.gdmanager.Base64Functions.*;
 
 public class GDManager {
-    private String levelsData;
     private GDLevel[] levels;
 
-    public GDManager(String levelDataPath) throws IOException, DataFormatException {
+    public GDManager(String levelDataPath) throws Exception {
         //
         // STEP 1: XOR WITH 11
         //
-        File xorFile = new File("C:/Users/diver/AppData/Local/GeometryDash/LocalLevelsXOR.dat");
-        File levelDataFile = new File("C:/Users/diver/AppData/Local/GeometryDash/CCLocalLevels.dat");
-        File baseOutFile = new File("C:/Users/diver/AppData/Local/GeometryDash/LocalLevelsDecoded.dat");
-        File dOutFile = new File("C:/Users/diver/AppData/Local/GeometryDash/LocalLevelsDecompressed.dat");
+        String basePath = "C:/Users/Daniel/AppData/Local/GeometryDash/";
+        File xorFile = new File(basePath + "LocalLevelsXOR.dat");
+        xorFile.createNewFile();
+        File levelDataFile = new File(basePath + "CCLocalLevels.dat");
+        levelDataFile.createNewFile();
+        File baseOutFile = new File(basePath + "LocalLevelsDecoded.dat");
+        baseOutFile.createNewFile();
+        File dOutFile = new File(basePath + "LocalLevelsDecompressed.dat");
         dOutFile.createNewFile();
 
         FileInputStream lin = new FileInputStream(levelDataFile);
@@ -62,22 +65,16 @@ public class GDManager {
         //
         // STEP 3: DECOMPRESS GZIP
         //
-        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(baseOutFile));
-        FileOutputStream dOut = new FileOutputStream(dOutFile);
-        while ((i = zipIn.read()) != -1) {
-            dOut.write(i);
-        }
-        zipIn.close();
-        dOut.close();
+        String lvlData = decompress(new FileInputStream(baseOutFile).readAllBytes());
 
 
-        /*DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
-
         Document document = null;
         try {
             builder = factory.newDocumentBuilder();
-            document = builder.parse(new InputSource(new StringReader(levelsData)));
+            document = builder.parse(new InputSource(new StringReader(lvlData)));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,11 +84,11 @@ public class GDManager {
 
         int levelCount = (dict.getChildNodes().item(1).getChildNodes().getLength() - 2) / 2;
         levels = new GDLevel[levelCount];
-        for (int i = 0; i < levelCount; i++) {
+        for (i = 0; i < levelCount; i++) {
             Node dataNode = dict.getChildNodes().item(1).getChildNodes().item(i*2+3);
 
             levels[i] = new GDLevel(dataNode.getChildNodes());
-        }*/
+        }
     }
 
     public GDLevel getLevel(String levelName) throws NoSuchLevelException {
@@ -112,26 +109,17 @@ public class GDManager {
         clipboard.setContents(selection, selection);
     }
 
-    public static byte[] decompress(byte[] bytes) throws IOException {
-        byte[] buffer = new byte[1024];
-        ByteArrayOutputStream bytesOut = null;
 
-        try {
-            ByteArrayInputStream bytesIn = new ByteArrayInputStream(bytes);
-            GZIPInputStream gZIPInputStream = new GZIPInputStream(bytesIn);
-            bytesOut = new ByteArrayOutputStream();
-            int bytes_read;
-            while ((bytes_read = gZIPInputStream.read(buffer)) > 0) {
-                bytesOut.write(buffer, 0, bytes_read);
-            }
-            gZIPInputStream.close();
-            bytesOut.close();
-            System.out.println("The file was decompressed successfully!");
-        } catch (IOException ex) {
-            ex.printStackTrace();
+    public static String decompress(byte[] str) throws Exception {
+        GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(str));
+        BufferedReader bf = new BufferedReader(new InputStreamReader(gis, "UTF-8"));
+
+        String outStr = "";
+        String line;
+        while ((line = bf.readLine()) != null) {
+            outStr += line;
         }
 
-        assert bytesOut != null;
-        return bytesOut.toByteArray();
+        return outStr;
     }
 }

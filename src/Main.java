@@ -9,14 +9,10 @@ import java.io.IOException;
 import java.util.zip.DataFormatException;
 
 public class Main {
-    public static void main(String[] args) throws IOException, NoSuchLevelException, DataFormatException {
+    public static void main(String[] args) throws Exception {
         GDManager gdManager = new GDManager("C:/Users/diver/AppData/Local/GeometryDash/CCLocalLevels.dat");
-//
-//        String data = gdManager.getLevel("level name").data;
-//        System.out.println(data);
-//        copy(data);
-        Color col = new Color();
-        System.out.println(col.storageFormat());
+
+        System.out.println(gdManager.getLevel("level name").colors.get(0).storageFormat());
     }
     public static void copy(String theString) {
         StringSelection selection = new StringSelection(theString);

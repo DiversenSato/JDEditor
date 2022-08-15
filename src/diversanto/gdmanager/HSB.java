@@ -7,6 +7,19 @@ public class HSB {
     private int saturationToggle = 0;
     private int brightnessToggle = 0;
 
+    public static HSB fromString(String data) {
+        String[] values = data.split("a");
+        if (values.length != 5) throw new NumberFormatException("HSB string data must have 5 values!");
+
+        HSB hsb = new HSB();
+        hsb.setHue(Integer.parseInt(values[0]));
+        hsb.setSaturation(Color.deFormatFloat(values[1]));
+        hsb.setBrightness(Color.deFormatFloat(values[2]));
+        hsb.setSaturationToggle(Integer.parseInt(values[3]) == 1);
+        hsb.setBrightnessToggle(Integer.parseInt(values[4]) == 1);
+        return hsb;
+    }
+
     public String storageFormat() {
         String out = "";
 
