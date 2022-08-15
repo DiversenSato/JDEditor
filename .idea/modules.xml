@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ByteChecker.iml" filepath="$PROJECT_DIR$/ByteChecker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JDEditor.iml" filepath="$PROJECT_DIR$/JDEditor.iml" />
     </modules>
   </component>
 </project>
