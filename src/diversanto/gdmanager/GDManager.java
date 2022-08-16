@@ -10,13 +10,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.zip.*;
-
-import static diversanto.gdmanager.Base64Functions.*;
 
 public class GDManager {
     private GDLevel[] levels;
@@ -25,65 +19,47 @@ public class GDManager {
         //
         // STEP 1: XOR WITH 11
         //
-        File xorFile = new File(basePath + "LocalLevelsXOR.dat");
-        xorFile.createNewFile();
         File levelDataFile = new File(basePath + "CCLocalLevels.dat");
         levelDataFile.createNewFile();
-        File baseOutFile = new File(basePath + "LocalLevelsDecoded.dat");
-        baseOutFile.createNewFile();
-        File dOutFile = new File(basePath + "LocalLevelsDecompressed.dat");
-        dOutFile.createNewFile();
 
         FileInputStream lin = new FileInputStream(levelDataFile);
-        OutputStream xout = new FileOutputStream(xorFile);
-        int i = 0;
-        while((i = lin.read()) != -1) {
-            int xored = i ^ 11;
-            if (xored == 0) continue;
-            if (xored == 45) xored = 43;
-            if (xored == 95) xored = 47;
-
-            xout.write(xored);
-        }
+        byte[] xoredData = sanitize(xor(lin.readAllBytes()));
         lin.close();
-        xout.close();
 
 
 
         //
         // STEP 2: Base64 DECODE
         //
-        FileInputStream xorin = new FileInputStream(xorFile);
-        FileOutputStream baseOut = new FileOutputStream(baseOutFile);
-        baseOut.write(Base64.getDecoder().decode(xorin.readAllBytes()));
-        baseOut.close();
-        xorin.close();
+        byte[] baseOut = Base64Functions.decode(xoredData);
 
 
 
         //
         // STEP 3: DECOMPRESS GZIP
         //
-        String lvlData = decompress(new FileInputStream(baseOutFile).readAllBytes());
+        String lvlData = decompress(baseOut);
 
 
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
-        Document document = null;
+        Document document;
         try {
             builder = factory.newDocumentBuilder();
             document = builder.parse(new InputSource(new StringReader(lvlData)));
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
 
+        assert document != null;
         Element plist = document.getDocumentElement();
         Node dict = plist.getElementsByTagName("dict").item(0);
 
         int levelCount = (dict.getChildNodes().item(1).getChildNodes().getLength() - 2) / 2;
         levels = new GDLevel[levelCount];
-        for (i = 0; i < levelCount; i++) {
+        for (int i = 0; i < levelCount; i++) {
             Node dataNode = dict.getChildNodes().item(1).getChildNodes().item(i*2+3);
 
             levels[i] = new GDLevel(dataNode.getChildNodes());
@@ -92,12 +68,12 @@ public class GDManager {
 
     public GDLevel getLevel(String levelName) throws NoSuchLevelException {
         for (GDLevel level : levels) {
-            if (level.name.equalsIgnoreCase(levelName)) {
+            if (level.name.equals(levelName)) {
                 return level;
             }
         }
 
-        throw new NoSuchLevelException("There are no levels matching the name \"" + levelName + "\"!");
+        throw new NoSuchLevelException("There are no levels matching the name \"" + levelName + "\"! Maybe check capitalization and spelling.");
     }
 
 
@@ -111,14 +87,37 @@ public class GDManager {
 
     public static String decompress(byte[] str) throws Exception {
         GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(str));
-        BufferedReader bf = new BufferedReader(new InputStreamReader(gis, "UTF-8"));
+        BufferedReader bf = new BufferedReader(new InputStreamReader(gis, StandardCharsets.UTF_8));
 
-        String outStr = "";
+        StringBuilder outStr = new StringBuilder();
         String line;
         while ((line = bf.readLine()) != null) {
-            outStr += line;
+            outStr.append(line);
         }
 
-        return outStr;
+        return outStr.toString();
+    }
+
+    public static byte[] xor(byte[] bytes) {
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte)(bytes[i] ^ 11);
+        }
+
+        return bytes;
+    }
+
+    public static byte[] sanitize(byte[] bytes) {
+        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+
+        for (byte aByte : bytes) {
+            byte b = aByte;
+            if (b == 0) continue;
+            if (b == 45) b = 43;
+            if (b == 95) b = 47;
+
+            bOut.write(b);
+        }
+
+        return bOut.toByteArray();
     }
 }
