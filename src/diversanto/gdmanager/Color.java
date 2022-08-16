@@ -19,35 +19,21 @@ public class Color {
             String value = split[i*2+1];
 
             switch (key) {
-                case 1:
-                    red = Integer.parseInt(value);
-                    break;
-                case 2:
-                    green = Integer.parseInt(value);
-                    break;
-                case 3:
-                    blue = Integer.parseInt(value);
-                    break;
-                case 4:
-                    copyPlayerCol = Integer.parseInt(value);
-                    break;
-                case 5:
-                    blending = Integer.parseInt(value) == 1;
-                    break;
-                case 6:
-                    colorChannel = Integer.parseInt(value);
-                    break;
-                case 7:
-                    opacity = deFormatFloat(value);
-                    break;
-                case 9:
+                case 1 -> red = Integer.parseInt(value);
+                case 2 -> green = Integer.parseInt(value);
+                case 3 -> blue = Integer.parseInt(value);
+                case 4 -> copyPlayerCol = Integer.parseInt(value);
+                case 5 -> blending = Integer.parseInt(value) == 1;
+                case 6 -> colorChannel = Integer.parseInt(value);
+                case 7 -> opacity = deFormatFloat(value);
+                case 9 -> {
                     useColorCopy = true;
                     copyColorChannel = Integer.parseInt(value);
-                    break;
-                case 10:
+                }
+                case 10 -> {
                     useColorCopy = true;
                     hsb = HSB.fromString(value);
-                    break;
+                }
             }
         }
     }
@@ -73,6 +59,20 @@ public class Color {
         return out;
     }
 
+
+
+    //
+    // GETTERS AND SETTERS
+    //
+    public int getRed() {
+        return red;
+    }
+    public void setRed(int value) {
+        red = Math.min(Math.max(value, 0), 255);
+    }
+
+
+
     public static String formatFloat(int f) {
         String hundreds = String.valueOf(f/100);
         String tens = String.valueOf(Math.abs(f / 10 % 10));
@@ -83,13 +83,17 @@ public class Color {
     }
 
     public static int deFormatFloat(String f) {
-        String[] parts = f.split(".");
-        int fl = 0;
+        String[] parts = f.split("\\.");
+        int fl;
         if (parts.length == 1) {
             fl = Integer.parseInt(parts[0]) * 100;
         } else {
             fl = Integer.parseInt(parts[0]) * 100 + Integer.parseInt(parts[1]);
         }
         return fl;
+    }
+
+    public int getChannel() {
+        return colorChannel;
     }
 }
