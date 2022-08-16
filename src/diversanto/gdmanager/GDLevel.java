@@ -12,50 +12,64 @@ import java.util.zip.DataFormatException;
 import static diversanto.gdmanager.Base64Functions.base64URLDecode;
 import static diversanto.gdmanager.GDManager.decompress;
 
-public class GDLevel {
+public class GDLevel extends GDConstants {
     protected String name;
     protected String description;
     public String data = "";
+    public int gameMode = GM_CUBE;
+    protected boolean mini = false;
+    protected int speed = SPEED_1X;
+    protected int backgroundType = 0;
+    protected int groundType = 0;
+    protected boolean dual = false;
+    protected boolean twoPlayer = false;
+    protected int lineType = 0;
+    protected int font = 0;
+
+
+
     public ArrayList<Color> colors = new ArrayList<>();
 
+
+
     protected GDLevel(NodeList dataList) throws Exception {
-        int k = 0;
-        while (!(dataList.item(k).getNodeName().equals("k") && dataList.item(k).getTextContent().equals("k4"))) {
-            k++;
-            if (k >= dataList.getLength()) return;
-        }
+        for (int i = 0; i < dataList.getLength(); i++) {
+            if (dataList.item(i).getNodeName().equals("k")) {
+                String key = dataList.item(i++).getTextContent();
+                String value = dataList.item(i).getTextContent();
 
-        String lvlDat = dataList.item(k+1).getTextContent().replace("-", "+").replace("_", "/");
-        String lvlData = decompress(Base64.getDecoder().decode(lvlDat.getBytes(StandardCharsets.UTF_8)));
-        String[] lvlDataKeyValue = lvlData.split(",");
+                switch (key) {
+                    case "k2" -> name = value;
+                    case "k3" -> description = new String(base64URLDecode(value), StandardCharsets.UTF_8);
+                    case "k4" -> {
+                        byte[] decoded = base64URLDecode(value);
+                        data = decompress(decoded);
+                        //Convert data to key value pairs
+                        String[] split = data.split(",");
+                        for (int j = 0; j < split.length / 2; j++) {
+                            String dataKey = split[i * 2];
+                            String dataValue = split[i * 2 + 1];
 
-        for (int i = 0; i < lvlDataKeyValue.length/2; i++) {
-            String key = lvlDataKeyValue[i*2];
-            String value = lvlDataKeyValue[i*2+1];
-
-            switch (key) {
-                case "k2":
-                    name = value;
-                    break;
-                case "k3":
-                    description = new String(base64URLDecode(value), StandardCharsets.UTF_8);
-                    break;
-                case "k4":
-                    data = decompress(base64URLDecode(value));
-                    //Convert data to key value pairs
-                    String[] split = data.split(",");
-                    for (int j = 0; j < split.length / 2; j++) {
-                        String dataKey = split[i*2];
-                        String dataValue = split[i*2+1];
-
-                        if (dataKey.equals("kS38")) {
-                            String[] cols = dataValue.split("|");
-                            for (String col : cols) {
-                                colors.add(new Color(col));
+                            switch (dataKey) {
+                                case "kS38" -> {
+                                    String[] cols = dataValue.split("|");
+                                    for (String col : cols) {
+                                        colors.add(new Color(col));
+                                    }
+                                }
+                                case "kA2" -> gameMode = Math.min(Math.max(Integer.parseInt(dataValue), 0), 6);
+                                case "kA3" -> mini = Integer.parseInt(dataValue) == 1;
+                                case "kA4" -> speed = Math.min(Math.max(Integer.parseInt(dataValue), 0), 4);
+                                case "kA6" -> backgroundType = Math.min(Math.max(Integer.parseInt(dataValue), 1), 20);
+                                case "kA7" -> groundType = Math.min(Math.max(Integer.parseInt(dataValue), 1), 7);
+                                case "kA8" -> dual = Integer.parseInt(dataValue) == 1;
+                                case "kA10" -> twoPlayer = Integer.parseInt(dataValue) == 1;
+                                case "kA17" -> lineType = Math.min(Math.max(Integer.parseInt(dataValue), 1), 2);
+                                case "kA18" -> font = Math.min(Math.max(Integer.parseInt(dataValue), 0), 11);
                             }
                         }
                     }
-                    break;
+                }
             }
         }
     }

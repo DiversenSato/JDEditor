@@ -10,7 +10,7 @@ import java.util.zip.DataFormatException;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        GDManager gdManager = new GDManager("C:/Users/diver/AppData/Local/GeometryDash/CCLocalLevels.dat");
+        GDManager gdManager = new GDManager("C:/Users/diver/AppData/Local/GeometryDash/");
 
         System.out.println(gdManager.getLevel("level name").colors.get(0).storageFormat());
     }

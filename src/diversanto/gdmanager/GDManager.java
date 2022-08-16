@@ -21,11 +21,10 @@ import static diversanto.gdmanager.Base64Functions.*;
 public class GDManager {
     private GDLevel[] levels;
 
-    public GDManager(String levelDataPath) throws Exception {
+    public GDManager(String basePath) throws Exception {
         //
         // STEP 1: XOR WITH 11
         //
-        String basePath = "C:/Users/Daniel/AppData/Local/GeometryDash/";
         File xorFile = new File(basePath + "LocalLevelsXOR.dat");
         xorFile.createNewFile();
         File levelDataFile = new File(basePath + "CCLocalLevels.dat");
