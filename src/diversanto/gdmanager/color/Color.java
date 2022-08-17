@@ -1,4 +1,4 @@
-package diversanto.gdmanager;
+package diversanto.gdmanager.color;
 
 public class Color {
     private int red = 40;

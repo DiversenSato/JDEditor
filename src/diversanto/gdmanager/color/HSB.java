@@ -1,4 +1,4 @@
-package diversanto.gdmanager;
+package diversanto.gdmanager.color;
 
 public class HSB {
     private int hue = 0;

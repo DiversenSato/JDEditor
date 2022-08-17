@@ -1,19 +1,16 @@
+import diversanto.gdmanager.GDLevel;
 import diversanto.gdmanager.GDManager;
-
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        GDManager gdManager = new GDManager("C:/Users/diver/AppData/Local/GeometryDash/");
+        GDManager gdManager = new GDManager("C:/Users/diver/AppData/Local/GeometryDash/CCLocalLevels.dat");
 
-        System.out.println(gdManager.getLevel("level name").getColor(1000).getRed());
-    }
+        /*GDLevel lvl = gdManager.getLevel("level name");
+        for (int i = 0; i < 700; i++) {
+            lvl.addObject(i, 100 + i*300, 300);
+        }*/
+        gdManager.deleteLevel("level name");
 
-    public static void copy(String theString) {
-        StringSelection selection = new StringSelection(theString);
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(selection, selection);
+        gdManager.save();
     }
 }
