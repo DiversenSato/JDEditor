@@ -13,41 +13,46 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.zip.*;
 
+import static diversanto.gdmanager.Base64Functions.isBase64Char;
+
 public class GDManager {
     private final ArrayList<GDLevel> levels = new ArrayList<>();
     private String basePath = "";
 
-    public GDManager(String basePath) throws Exception {
-        //
-        // STEP 1: XOR WITH 11
-        //
-        this.basePath = basePath;
+    public GDManager() throws Exception {
+        this.basePath = System.getenv("APPDATA").replace("Roaming", "Local\\GeometryDash\\CCLocalLevels.dat");
         File levelDataFile = new File(basePath);
 
         FileInputStream lin = new FileInputStream(levelDataFile);
-        byte[] xoredData = xor(lin.readAllBytes());
+        byte[] rawFile = lin.readAllBytes();
         lin.close();
 
+        String lvlData = new String(rawFile, StandardCharsets.UTF_8);
+        boolean isEncoded = !lvlData.startsWith("<");  //If the first byte of the LocalLevels.dat starts with "<", it is not encoded
+        if (isEncoded) {
+            //
+            // STEP 1: XOR WITH 11
+            //
+            byte[] xoredData = xor(rawFile);
 
 
-        //
-        // STEP 2: Base64 DECODE
-        //
-        byte[] baseOut = Base64Functions.decode(xoredData);  //decode() also sanitizes
+            //
+            // STEP 2: Base64 DECODE
+            //
+            byte[] baseOut = Base64Functions.decode(xoredData);  //decode() also sanitizes
 
 
+            //
+            // STEP 3: DECOMPRESS GZIP
+            //
+            lvlData = decompress(baseOut);
+        }
 
-        //
-        // STEP 3: DECOMPRESS GZIP
-        //
-        String lvlData = decompress(baseOut);
+        copy(lvlData);
 
-
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder;
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document;
         try {
-            builder = factory.newDocumentBuilder();
             document = builder.parse(new InputSource(new StringReader(lvlData)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,60 +62,97 @@ public class GDManager {
         assert document != null;
         Element plist = document.getDocumentElement();
         Node dict = plist.getElementsByTagName("dict").item(0);
+        Element LLM = (Element)dict.getFirstChild().getNextSibling();
+        NodeList levelEntries = LLM.getElementsByTagName("k");
+        for (int i = 0; i < levelEntries.getLength(); i++) {
+            Element key = (Element)levelEntries.item(i);
 
-        int levelCount = (dict.getChildNodes().item(1).getChildNodes().getLength() - 2) / 2;
-        for (int i = 0; i < levelCount; i++) {
-            Node dataNode = dict.getChildNodes().item(1).getChildNodes().item(i*2+3);
-
-            levels.add(new GDLevel(dataNode.getChildNodes()));
+            if (key.getTextContent().startsWith("k_")) {
+                levels.add(new GDLevel(key.getNextSibling().getChildNodes(), isEncoded));
+            }
         }
     }
 
-    public GDLevel getLevel(String levelName) throws NoSuchLevelException {
+    /**
+     * Fetches a level by searching for the name.
+     * If the level does not exist, null will be returned.
+     * @param levelName The name of the level.
+     * @return the level.
+     */
+    public GDLevel getLevel(String levelName) {
         for (GDLevel level : levels) {
             if (level.name.equals(levelName)) {
                 return level;
             }
         }
 
-        throw new NoSuchLevelException("There are no levels matching the name \"" + levelName + "\"! Maybe check capitalization and spelling.");
+        return null;
     }
 
-    public void deleteLevel(String levelName) {
+    /**
+     * Deletes the specified level if the GDManager has detected a level with that name.
+     * @param levelName The name of the level to be deleted.
+     * @return false if no level was deleted. Otherwise true.
+     */
+    public boolean deleteLevel(String levelName) {
         for (int i = 0; i < levels.size(); i++) {
             if (levels.get(i).getName().equals(levelName)) {
                 levels.remove(i);
-                break;
+
+                return true;
             }
         }
+
+        return false;
     }
 
 
-
+    /**
+     * Saves all changes to CCLocalLevels.dat.
+     * Not all properties have been parsed yet, so loading and saving a level might remove some data.
+     * @throws IOException if there was an I/O error regarding writing to CCLocalLevels.
+     */
     public void save() throws IOException {
+        FileOutputStream saveOut = new FileOutputStream(basePath);
+        FileOutputStream backupOut = new FileOutputStream(basePath.replace(".dat", "2.dat"));
+        saveOut.write(constructSaveFile().getBytes(StandardCharsets.UTF_8));
+        backupOut.write(constructSaveFile().getBytes(StandardCharsets.UTF_8));
+        saveOut.close();
+        backupOut.close();
+    }
+
+    private String constructSaveFile() {
         StringBuilder saveFile = new StringBuilder();
         saveFile.append("<?xml version=\"1.0\"?><plist version=\"1.0\" gjver=\"2.0\"><dict><k>LLM_01</k><d><k>_isArr</k><t />");
 
         for (int i = 0; i < levels.size(); i++) {
             String lvlFormatted = levels.get(i).storageFormat();
-            String lvlEntry = String.format("<k>k_%d</k><d><k>kCEK</k><i>4</i>%s<k>k50</k><i>35</i><k>k47</k><t /><k>kI1</k><r>0</r><k>kI2</k><r>36</r><k>kI3</k><r>1</r><k>kI6</k><d><k>0</k><s>0</s><k>1</k><s>0</s><k>2</k><s>0</s><k>3</k><s>0</s><k>4</k><s>0</s><k>5</k><s>0</s><k>6</k><s>0</s><k>7</k><s>0</s><k>8</k><s>0</s><k>9</k><s>0</s><k>10</k><s>0</s><k>11</k><s>0</s><k>12</k><s>0</s></d></d>", i, lvlFormatted);
+            String lvlEntry = String.format("<k>k_%d</k><d><k>kCEK</k><i>4</i>%s</d>", i, lvlFormatted);
             saveFile.append(lvlEntry);
         }
         saveFile.append("</d><k>LLM_02</k><i>35</i></dict></plist>");
 
-        FileOutputStream saveOut = new FileOutputStream(basePath);
-        copy(saveFile.toString());
-        saveOut.write(saveFile.toString().getBytes(StandardCharsets.UTF_8));
-        saveOut.close();
+        return saveFile.toString();
     }
 
 
-    public static String decompress(byte[] str) throws Exception {
-        System.out.println("Bytes to decompress: " + str.length);
-        GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(str));
+    /**
+     * Unzips a byte array and returns a new array.
+     * @param zippedBytes the zipped byte array.
+     * @return the unzipped byte array.
+     * @throws IOException if an I/O error has occurred.
+     */
+    public static String decompress(byte[] zippedBytes) throws IOException {
+        System.out.println("Bytes to decompress: " + zippedBytes.length);
+        GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(zippedBytes));
         return new String(gis.readAllBytes(), StandardCharsets.UTF_8);
     }
 
+    /**
+     * This function takes in an array of bytes, and individually XOR's every byte with the key, 11.
+     * @param bytes The byte array to be XOR'ed.
+     * @return the XOR'ed array.
+     */
     public static byte[] xor(byte[] bytes) {
         System.out.println("Bytes to xor: " + bytes.length);
         for (int i = 0; i < bytes.length; i++) {
@@ -120,6 +162,12 @@ public class GDManager {
         return bytes;
     }
 
+    /**
+     * Takes in an array of bytes and prepares it for Base64 decoding.
+     * This includes converting Base64URL characters to Base64 characters, and filtering out non-Base64 characters.
+     * @param bytes the array to be sanitized.
+     * @return the sanitized array.
+     */
     public static byte[] sanitize(byte[] bytes) {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
@@ -127,7 +175,7 @@ public class GDManager {
             byte b = aByte;
             if (b == 45) b = 43;
             if (b == 95) b = 47;
-            if (!isBase64Char(b)) continue;
+            if (!isBase64Char(b)) break;
 
             bOut.write(b);
         }
@@ -136,13 +184,24 @@ public class GDManager {
         return bOut.toByteArray();
     }
 
-    private static boolean isBase64Char(byte b) {
-        return (b >= 65 && b <= 90) || (b >= 97 && b <= 122) || (b >= 48 && b <= 57) || b == 43 || b == 47 || b == 61;
-    }
-
+    /**
+     * Simply copies a string to the clipboard.
+     * @param theString to be copied.
+     */
     public static void copy(String theString) {
         StringSelection selection = new StringSelection(theString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);
+    }
+
+    /**
+     * Creates a new empty level from scratch.
+     * @param levelName The name of the new level.
+     * @return the new level.
+     */
+    public GDLevel createLevel(String levelName) {
+        GDLevel newLevel = new GDLevel(levelName);
+        levels.add(newLevel);
+        return newLevel;
     }
 }

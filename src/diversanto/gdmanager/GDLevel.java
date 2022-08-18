@@ -6,13 +6,16 @@ import org.w3c.dom.NodeList;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+import static diversanto.gdmanager.GDManager.copy;
 import static diversanto.gdmanager.GDManager.decompress;
 
 public class GDLevel extends GDConstants {
-    protected String name;
-    protected String description;
-    protected String levelAuthor;
+    protected String name = "Template level";
+    protected String description = "Default description";
+    protected String levelAuthor = "JDEditor";
     protected int officialSongID = 0;
+    protected int version = 1;
+    protected int secondsSpent = 0;
 
     protected int gameMode = GM_CUBE;
     protected boolean mini = false;
@@ -28,10 +31,11 @@ public class GDLevel extends GDConstants {
 
     private final ArrayList<Color> colors = new ArrayList<>();
     private final ArrayList<GDObject> objects = new ArrayList<>();
+    private boolean hasData = false;
 
 
 
-    protected GDLevel(NodeList dataList) throws Exception {
+    protected GDLevel(NodeList dataList, boolean isEncoded) throws Exception {
         for (int i = 0; i < dataList.getLength(); i++) {
             if (dataList.item(i).getNodeName().equals("k")) {
                 String key = dataList.item(i++).getTextContent();
@@ -39,7 +43,10 @@ public class GDLevel extends GDConstants {
 
                 switch (key) {
                     case "k2" -> name = value;
-                    case "k3" -> description = new String(Base64Functions.decode(value.getBytes()), StandardCharsets.UTF_8);
+                    case "k3" -> {
+                        if (isEncoded) description = new String(Base64Functions.decode(value.getBytes()), StandardCharsets.UTF_8);
+                        else description = value;
+                    }
                     case "k4" -> {
                         String data = value;
                         if (!value.startsWith("kS38")) {
@@ -75,12 +82,25 @@ public class GDLevel extends GDConstants {
                         }
 
                         System.out.println("Level constructed from the data: " + data);
+                        hasData = true;
                     }
                     case "k5" -> levelAuthor = value;
                     case "k8" -> officialSongID = Integer.parseInt(value);
+                    case "k16" -> version = Integer.parseInt(value);
+                    case "k80" -> secondsSpent = Integer.parseInt(value);
                 }
             }
         }
+    }
+
+    protected GDLevel(String name) {
+        this.name = name;
+        colors.add(new Color("1_40_2_125_3_255_11_255_12_255_13_255_6_1000_7_1_15_1_18_0_8_1"));
+        colors.add(new Color("1_0_2_102_3_255_11_255_12_255_13_255_6_1001_7_1_15_1_18_0_8_1"));
+        colors.add(new Color("1_0_2_102_3_255_11_255_12_255_13_255_6_1009_7_1_15_1_18_0_8_1"));
+        colors.add(new Color("1_255_2_255_3_255_11_255_12_255_13_255_6_1002_5_1_7_1_15_1_18_0_8_1"));
+        colors.add(new Color("1_255_2_255_3_255_11_255_12_255_13_255_6_1005_5_1_7_1_15_1_18_0_8_1"));
+        colors.add(new Color("1_255_2_185_3_0_11_255_12_255_13_255_6_1006_5_1_7_1_15_1_18_0_8_1"));
     }
 
     public Color getColor(int colorChannel) {
@@ -94,7 +114,13 @@ public class GDLevel extends GDConstants {
     public GDObject addObject(int id, int x, int y) {
         GDObject newObj = new GDObject(id, x, y);
         objects.add(newObj);
+        hasData = true;
         return newObj;
+    }
+
+    public void addObject(GDObject o) {
+        objects.add(o);
+        hasData = true;
     }
 
     public String getName() {
@@ -126,7 +152,24 @@ public class GDLevel extends GDConstants {
         StringBuilder formatted = new StringBuilder();
 
         formatted.append(String.format("<k>k2</k><s>%s</s>", name));
-        formatted.append(String.format("<k>k4</k><s>%s</s>", formatData()));
+        formatted.append(String.format("<k>k3</k><s>%s</s>", Base64Functions.encode(description)));
+        if (hasData) formatted.append(String.format("<k>k4</k><s>%s</s>", formatData()));
+        formatted.append(String.format("<k>k5</k><s>%s</s>", levelAuthor));
+        formatted.append("<k>k13</k><t />");
+        formatted.append("<k>k21</k><i>2</i>");
+        formatted.append(String.format("<k>k16</k><i>%s</i>", version));
+        if (hasData) formatted.append(String.format("<k>k80</k><i>%s</i>", secondsSpent));
+        formatted.append("<k>k50</k><i>35</i>");
+        formatted.append("<k>k47</k><t />");
+        formatted.append("<k>kI1</k><r>0</r>");
+        formatted.append("<k>kI2</k><r>36</r>");
+        formatted.append("<k>kI3</k><r>1</r>");
+
+        formatted.append("<k>kI6</k><d>");
+        for (int i = 0; i < 12; i++) {
+            formatted.append(String.format("<k>%d</k><s>0</s>", i));
+        }
+        formatted.append("</d>");
 
         return formatted.toString();
     }
@@ -158,5 +201,9 @@ public class GDLevel extends GDConstants {
         }
 
         return formatted.toString();
+    }
+
+    public void deleteObjects() {
+        objects.clear();
     }
 }
