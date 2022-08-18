@@ -6,7 +6,7 @@ import java.util.Base64;
 
 public class Base64Functions {
     public static byte[] decode(byte[] bytes) {
-        byte[] sanitized = GDManager.sanitize(bytes);
+        byte[] sanitized = Manager.sanitize(bytes);
         return Base64.getDecoder().decode(sanitized);
     }
 

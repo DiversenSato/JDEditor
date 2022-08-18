@@ -15,11 +15,11 @@ import java.util.zip.*;
 
 import static diversanto.gdmanager.Base64Functions.isBase64Char;
 
-public class GDManager {
-    private final ArrayList<GDLevel> levels = new ArrayList<>();
+public class Manager {
+    private final ArrayList<Level> levels = new ArrayList<>();
     private String basePath = "";
 
-    public GDManager() throws Exception {
+    public Manager() throws Exception {
         this.basePath = System.getenv("APPDATA").replace("Roaming", "Local\\GeometryDash\\CCLocalLevels.dat");
         File levelDataFile = new File(basePath);
 
@@ -68,7 +68,7 @@ public class GDManager {
             Element key = (Element)levelEntries.item(i);
 
             if (key.getTextContent().startsWith("k_")) {
-                levels.add(new GDLevel(key.getNextSibling().getChildNodes(), isEncoded));
+                levels.add(new Level(key.getNextSibling().getChildNodes(), isEncoded));
             }
         }
     }
@@ -79,8 +79,8 @@ public class GDManager {
      * @param levelName The name of the level.
      * @return the level.
      */
-    public GDLevel getLevel(String levelName) {
-        for (GDLevel level : levels) {
+    public Level getLevel(String levelName) {
+        for (Level level : levels) {
             if (level.name.equals(levelName)) {
                 return level;
             }
@@ -199,8 +199,8 @@ public class GDManager {
      * @param levelName The name of the new level.
      * @return the new level.
      */
-    public GDLevel createLevel(String levelName) {
-        GDLevel newLevel = new GDLevel(levelName);
+    public Level createLevel(String levelName) {
+        Level newLevel = new Level(levelName);
         levels.add(newLevel);
         return newLevel;
     }

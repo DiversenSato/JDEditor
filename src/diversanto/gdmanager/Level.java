@@ -6,10 +6,9 @@ import org.w3c.dom.NodeList;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import static diversanto.gdmanager.GDManager.copy;
-import static diversanto.gdmanager.GDManager.decompress;
+import static diversanto.gdmanager.Manager.decompress;
 
-public class GDLevel extends GDConstants {
+public class Level extends Constants {
     protected String name = "Template level";
     protected String description = "Default description";
     protected String levelAuthor = "JDEditor";
@@ -17,7 +16,7 @@ public class GDLevel extends GDConstants {
     protected int version = 1;
     protected int secondsSpent = 0;
 
-    protected int gameMode = GM_CUBE;
+    protected int gameMode = CUBE;
     protected boolean mini = false;
     protected int speed = SPEED_1X;
     protected int backgroundType = 0;
@@ -35,7 +34,7 @@ public class GDLevel extends GDConstants {
 
 
 
-    protected GDLevel(NodeList dataList, boolean isEncoded) throws Exception {
+    protected Level(NodeList dataList, boolean isEncoded) throws Exception {
         for (int i = 0; i < dataList.getLength(); i++) {
             if (dataList.item(i).getNodeName().equals("k")) {
                 String key = dataList.item(i++).getTextContent();
@@ -93,7 +92,7 @@ public class GDLevel extends GDConstants {
         }
     }
 
-    protected GDLevel(String name) {
+    protected Level(String name) {
         this.name = name;
         colors.add(new Color("1_40_2_125_3_255_11_255_12_255_13_255_6_1000_7_1_15_1_18_0_8_1"));
         colors.add(new Color("1_0_2_102_3_255_11_255_12_255_13_255_6_1001_7_1_15_1_18_0_8_1"));

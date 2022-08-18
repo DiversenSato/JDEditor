@@ -1,14 +1,14 @@
-import diversanto.gdmanager.GDLevel;
-import diversanto.gdmanager.GDManager;
+import diversanto.gdmanager.Level;
+import diversanto.gdmanager.Manager;
 import diversanto.gdmanager.GDObject;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        GDManager gdManager = new GDManager();
+        Manager manager = new Manager();
 
-        GDLevel lvl;
-        if ((lvl = gdManager.getLevel("level name")) == null) {
-            lvl = gdManager.createLevel("level name");
+        Level lvl;
+        if ((lvl = manager.getLevel("level name")) == null) {
+            lvl = manager.createLevel("level name");
         } else {
             lvl.deleteObjects();
         }
@@ -20,6 +20,6 @@ public class Main {
             lvl.addObject(GDObject.createText(100 + i*90, 150, String.valueOf(i)));
         }
 
-        gdManager.save();
+        manager.save();
     }
 }
