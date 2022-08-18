@@ -16,7 +16,7 @@ public class GDObject {
      * Converts this GD object to the string representation used by GD to store levels.
      * @return the formatted object.
      */
-    public String storageFormat() {
+    protected String storageFormat() {
         StringBuilder formatted = new StringBuilder();
 
         formatted.append("1," + id + ",");

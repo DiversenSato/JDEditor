@@ -32,7 +32,7 @@ public class Color {
                 }
                 case 10 -> {
                     useColorCopy = true;
-                    hsb = HSB.fromString(value);
+                    hsb = new HSB(value);
                 }
             }
         }
@@ -71,9 +71,13 @@ public class Color {
         red = Math.min(Math.max(value, 0), 255);
     }
 
+    public int getChannel() {
+        return colorChannel;
+    }
 
 
-    public static String formatFloat(int f) {
+
+    protected static String formatFloat(int f) {
         String hundreds = String.valueOf(f/100);
         String tens = String.valueOf(Math.abs(f / 10 % 10));
         String ones = String.valueOf(Math.abs(f % 10));
@@ -82,7 +86,7 @@ public class Color {
         return hundreds + "." + tens + ones;
     }
 
-    public static int deFormatFloat(String f) {
+    protected static int deFormatFloat(String f) {
         String[] parts = f.split("\\.");
         int fl;
         if (parts.length == 1) {
@@ -91,9 +95,5 @@ public class Color {
             fl = Integer.parseInt(parts[0]) * 100 + Integer.parseInt(parts[1]);
         }
         return fl;
-    }
-
-    public int getChannel() {
-        return colorChannel;
     }
 }

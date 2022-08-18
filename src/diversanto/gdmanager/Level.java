@@ -147,7 +147,7 @@ public class Level extends Constants {
         return description;
     }
 
-    public String storageFormat() {
+    protected String storageFormat() {
         StringBuilder formatted = new StringBuilder();
 
         formatted.append(String.format("<k>k2</k><s>%s</s>", name));
