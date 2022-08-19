@@ -1,8 +1,13 @@
 # JDEditor
 A simple library for Java that can alter or create Geometry Dash levels.
 
-# Reference guide
-All public classes and methods are listed below:
+Grab the library [here.](https://github.com/DiversenSato/JDEditor/releases/tag/v.1.0.1)
+
+# How to use
+The JDEditor library works by using a [Manager](#class-manager) object that automatically loads saved levels. This [Manager](#class-manager) has methods for creating, getting, deleting and saving levels.
+
+# Reference v.1.0.1
+All public classes and methods are listed below, I think:
 
 - [Manager](#class-manager)
 - [Level](#class-level)
