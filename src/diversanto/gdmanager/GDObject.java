@@ -2,9 +2,11 @@ package diversanto.gdmanager;
 
 public class GDObject {
     private int id = 0;
-    int x = 0;
-    int y = 0;
+    private int x = 0;
+    private int y = 0;
+    private int rotationAngle = 0;
     private String text = null;
+    private int noGlow = 0;
 
     public GDObject(int id, int x, int y) {
         this.id = id;
@@ -22,10 +24,20 @@ public class GDObject {
         formatted.append("1," + id + ",");
         formatted.append("2," + x + ",");
         formatted.append("3," + y + ",");
-        if (text != null) formatted.append("31," + Base64Functions.encode(text));
+        if (rotationAngle != 0) formatted.append("6," + rotationAngle + ",");
+        if (text != null) formatted.append("31," + Base64Functions.encode(text) + ",");
+        if (noGlow == 1) formatted.append("96,1,");
 
         formatted.append(";");
         return formatted.toString().replace(",;", ";");
+    }
+
+    public void setRotation(int angle) {
+        rotationAngle = angle;
+    }
+
+    public void setNoGlow() {
+        noGlow = 1;
     }
 
     /**

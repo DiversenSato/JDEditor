@@ -6,11 +6,12 @@ import org.w3c.dom.NodeList;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+import static diversanto.gdmanager.Manager.copy;
 import static diversanto.gdmanager.Manager.decompress;
 
 public class Level extends Constants {
     protected String name = "Template level";
-    protected String description = "Default description";
+    protected String description = "Created using JDEditor";
     protected String levelAuthor = "JDEditor";
     protected int officialSongID = 0;
     protected int version = 1;
@@ -53,6 +54,7 @@ public class Level extends Constants {
                             byte[] decoded = Base64Functions.decode(value.getBytes(StandardCharsets.UTF_8));
                             data = decompress(decoded);
                         }
+                        copy(data);
 
                         //Convert data to key value pairs
                         String[] split = data.split(";");
@@ -80,7 +82,6 @@ public class Level extends Constants {
                             }
                         }
 
-                        System.out.println("Level constructed from the data: " + data);
                         hasData = true;
                     }
                     case "k5" -> levelAuthor = value;
@@ -145,6 +146,14 @@ public class Level extends Constants {
         }
 
         return description;
+    }
+
+    public void setGameMode(int gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
     protected String storageFormat() {

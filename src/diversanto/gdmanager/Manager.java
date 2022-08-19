@@ -17,7 +17,7 @@ import static diversanto.gdmanager.Base64Functions.isBase64Char;
 
 public class Manager {
     private final ArrayList<Level> levels = new ArrayList<>();
-    private String basePath = "";
+    private final String basePath;
 
     public Manager() throws Exception {
         this.basePath = System.getenv("APPDATA").replace("Roaming", "Local\\GeometryDash\\CCLocalLevels.dat");
@@ -47,8 +47,6 @@ public class Manager {
             //
             lvlData = decompress(baseOut);
         }
-
-        copy(lvlData);
 
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document;
@@ -106,6 +104,16 @@ public class Manager {
         return false;
     }
 
+    /**
+     * Creates a new empty level from scratch.
+     * @param levelName The name of the new level.
+     * @return the new level.
+     */
+    public Level createLevel(String levelName) {
+        Level newLevel = new Level(levelName);
+        levels.add(0, newLevel);
+        return newLevel;
+    }
 
     /**
      * Saves all changes to CCLocalLevels.dat.
@@ -192,16 +200,5 @@ public class Manager {
         StringSelection selection = new StringSelection(theString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);
-    }
-
-    /**
-     * Creates a new empty level from scratch.
-     * @param levelName The name of the new level.
-     * @return the new level.
-     */
-    public Level createLevel(String levelName) {
-        Level newLevel = new Level(levelName);
-        levels.add(newLevel);
-        return newLevel;
     }
 }
