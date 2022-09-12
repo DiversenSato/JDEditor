@@ -10,6 +10,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.zip.*;
 
@@ -17,18 +19,28 @@ import static diversanto.gdmanager.Base64Functions.isBase64Char;
 
 public class Manager {
     private final ArrayList<Level> levels = new ArrayList<>();
-    private final String basePath;
+    private final String basePath = System.getenv("APPDATA").replace("Roaming", "Local\\GeometryDash");
 
     public Manager() throws Exception {
-        this.basePath = System.getenv("APPDATA").replace("Roaming", "Local\\GeometryDash\\CCLocalLevels.dat");
-        File levelDataFile = new File(basePath);
+        File levelDataFile = new File(basePath + "\\CCLocalLevels.dat");
 
         FileInputStream lin = new FileInputStream(levelDataFile);
-        byte[] rawFile = lin.readAllBytes();
+        byte[] rawFile = lin.readAllBytes();   //<-- Contains all the bytes from CCLocalLevels.dat
         lin.close();
 
+        //Create backup
+        try {
+            LocalDateTime dateTime = LocalDateTime.now();
+            String date = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH.mm.ss"));
+            FileOutputStream backupStream = new FileOutputStream(basePath + "\\backups\\" + date + ".dat");
+            backupStream.write(rawFile);   //Writes the save file to a backup file
+            backupStream.close();
+        } catch (IOException e) {
+            System.err.println("An error occurred while attempting to create the backup");
+        }
+
         String lvlData = new String(rawFile, StandardCharsets.UTF_8);
-        boolean isEncoded = !lvlData.startsWith("<");  //If the first byte of the LocalLevels.dat starts with "<", it is not encoded
+        boolean isEncoded = !lvlData.startsWith("<");  //If the first byte of LocalLevels.dat starts with "<", it is not encoded
         if (isEncoded) {
             //
             // STEP 1: XOR WITH 11
@@ -54,7 +66,6 @@ public class Manager {
         try {
             document = builder.parse(new InputSource(new StringReader(lvlData)));
         } catch (Exception e) {
-            e.printStackTrace();
             throw e;
         }
 
@@ -106,6 +117,7 @@ public class Manager {
     }
 
     public void deleteAllLevels() {
+        System.out.println("Deleted " + levels.size() + " level" + (levels.size() == 1 ? "" : "s"));
         levels.clear();
     }
 
@@ -126,8 +138,8 @@ public class Manager {
      * @throws IOException if there was an I/O error regarding writing to CCLocalLevels.
      */
     public void save() throws IOException {
-        FileOutputStream saveOut = new FileOutputStream(basePath);
-        FileOutputStream backupOut = new FileOutputStream(basePath.replace(".dat", "2.dat"));
+        FileOutputStream saveOut = new FileOutputStream(basePath + "\\CCLocalLevels.dat");
+        FileOutputStream backupOut = new FileOutputStream(basePath + "\\CCLocalLevels2.dat");
         byte[] save = constructSaveFile(true);
         System.out.println("Saving " + save.length + " bytes");
         saveOut.write(save);

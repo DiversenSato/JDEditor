@@ -2,8 +2,8 @@ package diversanto.gdmanager.color;
 
 public class HSB {
     private int hue = 0;
-    private int saturation = 100;
-    private int brightness = 100;
+    private float saturation = 100;
+    private float brightness = 100;
     private int saturationToggle = 0;
     private int brightnessToggle = 0;
 
@@ -14,8 +14,8 @@ public class HSB {
         if (values.length != 5) throw new NumberFormatException("HSB string data must have 5 values!");
 
         setHue(Integer.parseInt(values[0]));
-        setSaturation(Color.deFormatFloat(values[1]));
-        setBrightness(Color.deFormatFloat(values[2]));
+        setSaturation(Float.parseFloat(values[1]));
+        setBrightness(Float.parseFloat(values[2]));
         setSaturationToggle(Integer.parseInt(values[3]) == 1);
         setBrightnessToggle(Integer.parseInt(values[4]) == 1);
     }
@@ -62,8 +62,8 @@ public class HSB {
         String out = "";
 
         out += hue + "a";
-        out += Color.formatFloat(saturation) + "a";
-        out += Color.formatFloat(brightness) + "a";
+        out += saturation + "a";
+        out += brightness + "a";
         out += saturationToggle + "a";
         out += brightnessToggle;
 
@@ -80,10 +80,10 @@ public class HSB {
 
 
 
-    public int getSaturation() {
+    public float getSaturation() {
         return saturation;
     }
-    public void setSaturation(int saturation) {
+    public void setSaturation(float saturation) {
         if (saturationToggle == 1) {
             this.saturation = Math.min(Math.max(-100, saturation), 100);
         } else {
@@ -93,10 +93,10 @@ public class HSB {
 
 
 
-    public int getBrightness() {
+    public float getBrightness() {
         return brightness;
     }
-    public void setBrightness(int brightness) {
+    public void setBrightness(float brightness) {
         if (brightnessToggle == 1) {
             this.brightness = Math.min(Math.max(-100, brightness), 100);
         } else {

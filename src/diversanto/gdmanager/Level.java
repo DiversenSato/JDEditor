@@ -57,6 +57,7 @@ public class Level extends Constants {
                             byte[] decoded = Base64Functions.decode(value.getBytes(StandardCharsets.UTF_8));
                             data = decompress(decoded);
                         }
+                        Manager.copy(data);
 
                         //Convert data to key value pairs
                         String[] split = data.split(";");
@@ -82,6 +83,11 @@ public class Level extends Constants {
                                 case "kA17" -> lineType = Math.min(Math.max(Integer.parseInt(dataValue), 1), 2);
                                 case "kA18" -> font = Math.min(Math.max(Integer.parseInt(dataValue), 0), 11);
                             }
+                        }
+
+                        //Add objects to this level
+                        for (int j = 1; j < split.length; j++) {
+                            objects.add(new GDObject(split[j]));
                         }
 
                         hasData = true;

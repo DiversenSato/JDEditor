@@ -15,34 +15,34 @@ public class Main {
     private static final Random rand = new Random();
 
     public static void main(String[] args) throws Exception {
-        String imagePath = "C:\\Users\\diver\\Pictures\\magnus.png";
-        BufferedImage picture = ImageIO.read(new File(imagePath));
+//        String imagePath = "C:\\Users\\diver\\Pictures\\magnus.png";
+//        BufferedImage picture = ImageIO.read(new File(imagePath));
 
         Manager manager = new Manager();
 
-        manager.deleteAllLevels();
-        manager.deleteLevel("image test");
-        Level imageLevel = manager.createLevel("image test");
+//        manager.deleteAllLevels();
+//        Level imageLevel = manager.createLevel("image test");
+//
+//        Color col = new Color(1);
+//        col.setRGB(255, 0, 0);
+//        imageLevel.addColorChannel(col);
 
-        Color col = new Color(1);
-        col.setRGB(255, 0, 0);
-        imageLevel.addColorChannel(col);
+//        int resolution = 54;
+//        int sampleDistance = Math.min(picture.getWidth(), picture.getHeight()) / resolution;
+//        for (int y = 0; y < resolution; y++) {
+//            for (int x = 0; x < resolution; x++) {
+//                GDObject obj = new GDObject(211, x * 3 + 285, y * -3 + (75 + resolution*3));
+//                obj.setScale(0.1f);
+//                obj.addGroup(1);
+//                obj.setColorChannel(col);
+//
+//                obj.getHSB().setRGB(picture.getRGB(x * sampleDistance, y * sampleDistance));
+//
+//                imageLevel.addObject(obj);
+//            }
+//        }
 
-        int resolution = 54;
-        int sampleDistance = Math.min(picture.getWidth(), picture.getHeight()) / resolution;
-        for (int y = 0; y < resolution; y++) {
-            for (int x = 0; x < resolution; x++) {
-                GDObject obj = new GDObject(211, x * 3 + 285, y * -3 + (75 + resolution*3));
-                obj.setScale(0.1f);
-                obj.addGroup(1);
-                obj.setColorChannel(col);
-
-                obj.getHSB().setRGB(picture.getRGB(x * sampleDistance, y * sampleDistance));
-
-                imageLevel.addObject(obj);
-            }
-        }
-
-        manager.save();
+        //manager.save();
+        manager.constructSaveFile();
     }
 }

@@ -7,7 +7,7 @@ public class Color {
     private int copyPlayerCol = -1;
     private boolean blending = false;
     private int colorChannel = 1000;
-    private int opacity = 100;
+    private float opacity = 100;
     private int copyColorChannel = 1;
     private boolean useColorCopy = false;
     private HSB hsb = new HSB();
@@ -25,7 +25,7 @@ public class Color {
                 case 4 -> copyPlayerCol = Integer.parseInt(value);
                 case 5 -> blending = Integer.parseInt(value) == 1;
                 case 6 -> colorChannel = Integer.parseInt(value);
-                case 7 -> opacity = deFormatFloat(value);
+                case 7 -> opacity = Float.parseFloat(value);
                 case 9 -> {
                     useColorCopy = true;
                     copyColorChannel = Integer.parseInt(value);
@@ -53,7 +53,7 @@ public class Color {
         out += "4_" + copyPlayerCol + "_";
         out += "6_" + colorChannel + "_";
         if (blending) out += "5_1_";
-        out += "7_" + formatFloat(opacity) + "_";
+        out += "7_" + opacity + "_";
         out += "15_1_";
         if (useColorCopy) {
             out += "9_" + copyColorChannel + "_";
@@ -84,27 +84,5 @@ public class Color {
 
     public int getChannel() {
         return colorChannel;
-    }
-
-
-
-    protected static String formatFloat(int f) {
-        String hundreds = String.valueOf(f/100);
-        String tens = String.valueOf(Math.abs(f / 10 % 10));
-        String ones = String.valueOf(Math.abs(f % 10));
-
-        if (f % 100 == 0) return hundreds;
-        return hundreds + "." + tens + ones;
-    }
-
-    protected static int deFormatFloat(String f) {
-        String[] parts = f.split("\\.");
-        int fl;
-        if (parts.length == 1) {
-            fl = Integer.parseInt(parts[0]) * 100;
-        } else {
-            fl = Integer.parseInt(parts[0]) * 100 + Integer.parseInt(parts[1]);
-        }
-        return fl;
     }
 }
