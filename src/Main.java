@@ -42,7 +42,7 @@ public class Main {
 //            }
 //        }
 
-        //manager.save();
-        manager.constructSaveFile();
+        if (!Manager.debug) manager.save();
+        if (Manager.debug) manager.constructSaveFile();
     }
 }

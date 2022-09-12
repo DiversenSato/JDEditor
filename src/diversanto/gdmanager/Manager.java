@@ -18,6 +18,8 @@ import java.util.zip.*;
 import static diversanto.gdmanager.Base64Functions.isBase64Char;
 
 public class Manager {
+    public static boolean debug = true;
+
     private final ArrayList<Level> levels = new ArrayList<>();
     private final String basePath = System.getenv("APPDATA").replace("Roaming", "Local\\GeometryDash");
 
