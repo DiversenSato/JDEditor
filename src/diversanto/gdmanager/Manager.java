@@ -33,6 +33,7 @@ public class Manager {
             //
             // STEP 1: XOR WITH 11
             //
+            System.out.println("Decoding " + rawFile.length + " bytes");
             byte[] xoredData = xor(rawFile);
 
 
@@ -127,13 +128,15 @@ public class Manager {
     public void save() throws IOException {
         FileOutputStream saveOut = new FileOutputStream(basePath);
         FileOutputStream backupOut = new FileOutputStream(basePath.replace(".dat", "2.dat"));
-        saveOut.write(constructSaveFile().getBytes(StandardCharsets.UTF_8));
-        backupOut.write(constructSaveFile().getBytes(StandardCharsets.UTF_8));
+        byte[] save = constructSaveFile(true);
+        System.out.println("Saving " + save.length + " bytes");
+        saveOut.write(save);
+        backupOut.write(save);
         saveOut.close();
         backupOut.close();
     }
 
-    public String constructSaveFile() {
+    public byte[] constructSaveFile() {
         StringBuilder saveFile = new StringBuilder();
         saveFile.append("<?xml version=\"1.0\"?><plist version=\"1.0\" gjver=\"2.0\"><dict><k>LLM_01</k><d><k>_isArr</k><t />");
 
@@ -143,11 +146,11 @@ public class Manager {
         }
         saveFile.append("</d><k>LLM_02</k><i>35</i></dict></plist>");
 
-        return saveFile.toString();
+        return saveFile.toString().getBytes(StandardCharsets.UTF_8);
     }
-    public String constructSaveFile(boolean encode) throws IOException {
+    public byte[] constructSaveFile(boolean encode) throws IOException {
         if (encode) {
-            return new String(xor(Base64Functions.encode(compress(constructSaveFile())).getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+            return xor(Base64Functions.encode(compress(constructSaveFile())).getBytes(StandardCharsets.UTF_8));
         } else {
             return constructSaveFile();
         }
@@ -162,15 +165,14 @@ public class Manager {
      * @throws IOException if an I/O error has occurred.
      */
     public static String decompress(byte[] zippedBytes) throws IOException {
-        System.out.println("Bytes to decompress: " + zippedBytes.length);
         GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(zippedBytes));
         return new String(gis.readAllBytes(), StandardCharsets.UTF_8);
     }
 
-    public static byte[] compress(String input) throws IOException {
+    public static byte[] compress(byte[] input) throws IOException {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         GZIPOutputStream gout = new GZIPOutputStream(byteStream);
-        gout.write(input.getBytes(StandardCharsets.UTF_8));
+        gout.write(input);
         gout.close();
         return byteStream.toByteArray();
     }
@@ -181,7 +183,6 @@ public class Manager {
      * @return the XOR'ed array.
      */
     public static byte[] xor(byte[] bytes) {
-        System.out.println("Bytes to xor: " + bytes.length);
         for (int i = 0; i < bytes.length; i++) {
             bytes[i] = (byte)(bytes[i] ^ 11);
         }
@@ -207,7 +208,8 @@ public class Manager {
             bOut.write(b);
         }
 
-        System.out.println("Sanitation removed " + (bytes.length - bOut.size()) + " bytes!");
+        int bytesRemoved = bytes.length - bOut.size();
+        if (bytesRemoved > 0) System.out.println("Sanitation removed " + bytesRemoved + " bytes!");
         return bOut.toByteArray();
     }
 

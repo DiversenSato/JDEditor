@@ -8,6 +8,7 @@ import diversanto.gdmanager.color.HSB;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class Main {
@@ -43,6 +44,5 @@ public class Main {
         }
 
         manager.save();
-        Manager.copy(manager.constructSaveFile());
     }
 }

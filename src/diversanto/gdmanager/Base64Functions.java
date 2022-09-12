@@ -11,14 +11,7 @@ public class Base64Functions {
     }
 
     public static String encode(String str) {
-        ByteArrayOutputStream arrOut = new ByteArrayOutputStream();
-        for (Byte b: Base64.getEncoder().encode(str.getBytes(StandardCharsets.UTF_8))) {
-            if (b == 43) b = 45;
-            if (b == 47) b = 95;
-            arrOut.write(b);
-        }
-
-        return arrOut.toString(StandardCharsets.UTF_8);
+        return encode(str.getBytes(StandardCharsets.UTF_8));
     }
     public static String encode(byte[] bytes) {
         ByteArrayOutputStream arrOut = new ByteArrayOutputStream();

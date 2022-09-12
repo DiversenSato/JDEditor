@@ -37,6 +37,8 @@ public class Level extends Constants {
 
 
     protected Level(NodeList dataList, boolean isEncoded) throws Exception {
+        int rawByteLength = -1;
+
         for (int i = 0; i < dataList.getLength(); i++) {
             if (dataList.item(i).getNodeName().equals("k")) {
                 String key = dataList.item(i++).getTextContent();
@@ -51,11 +53,10 @@ public class Level extends Constants {
                     case "k4" -> {
                         String data = value;
                         if (!value.startsWith("kS38")) {
-                            System.out.println("Decoding " + value.length() + " bytes for level data!");
+                            rawByteLength = value.length();
                             byte[] decoded = Base64Functions.decode(value.getBytes(StandardCharsets.UTF_8));
                             data = decompress(decoded);
                         }
-                        Manager.copy(data);
 
                         //Convert data to key value pairs
                         String[] split = data.split(";");
@@ -92,6 +93,8 @@ public class Level extends Constants {
                 }
             }
         }
+
+        System.out.println("Loaded \"" + name + "\" from " + rawByteLength + " bytes");
     }
 
     protected Level(String name) {
@@ -215,7 +218,7 @@ public class Level extends Constants {
         }
 
         try {
-            return Base64Functions.encode(Manager.compress(formatted.toString()));
+            return Base64Functions.encode(Manager.compress(formatted.toString().getBytes(StandardCharsets.UTF_8)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
