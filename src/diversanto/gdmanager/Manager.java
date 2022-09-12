@@ -104,6 +104,10 @@ public class Manager {
         return false;
     }
 
+    public void deleteAllLevels() {
+        levels.clear();
+    }
+
     /**
      * Creates a new empty level from scratch.
      * @param levelName The name of the new level.
@@ -134,14 +138,21 @@ public class Manager {
         saveFile.append("<?xml version=\"1.0\"?><plist version=\"1.0\" gjver=\"2.0\"><dict><k>LLM_01</k><d><k>_isArr</k><t />");
 
         for (int i = 0; i < levels.size(); i++) {
-            String lvlFormatted = levels.get(i).storageFormat();
-            String lvlEntry = String.format("<k>k_%d</k><d><k>kCEK</k><i>4</i>%s</d>", i, lvlFormatted);
+            String lvlEntry = String.format("<k>k_%d</k><d><k>kCEK</k><i>4</i>%s</d>", i, levels.get(i));
             saveFile.append(lvlEntry);
         }
         saveFile.append("</d><k>LLM_02</k><i>35</i></dict></plist>");
 
         return saveFile.toString();
     }
+    public String constructSaveFile(boolean encode) throws IOException {
+        if (encode) {
+            return new String(xor(Base64Functions.encode(compress(constructSaveFile())).getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+        } else {
+            return constructSaveFile();
+        }
+    }
+
 
 
     /**
@@ -154,6 +165,14 @@ public class Manager {
         System.out.println("Bytes to decompress: " + zippedBytes.length);
         GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(zippedBytes));
         return new String(gis.readAllBytes(), StandardCharsets.UTF_8);
+    }
+
+    public static byte[] compress(String input) throws IOException {
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        GZIPOutputStream gout = new GZIPOutputStream(byteStream);
+        gout.write(input.getBytes(StandardCharsets.UTF_8));
+        gout.close();
+        return byteStream.toByteArray();
     }
 
     /**

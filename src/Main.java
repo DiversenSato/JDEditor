@@ -6,7 +6,6 @@ import diversanto.gdmanager.color.Color;
 import diversanto.gdmanager.color.HSB;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Random;
@@ -20,6 +19,7 @@ public class Main {
 
         Manager manager = new Manager();
 
+        manager.deleteAllLevels();
         manager.deleteLevel("image test");
         Level imageLevel = manager.createLevel("image test");
 
@@ -43,5 +43,6 @@ public class Main {
         }
 
         manager.save();
+        Manager.copy(manager.constructSaveFile());
     }
 }

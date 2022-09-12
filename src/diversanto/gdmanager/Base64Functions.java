@@ -20,6 +20,16 @@ public class Base64Functions {
 
         return arrOut.toString(StandardCharsets.UTF_8);
     }
+    public static String encode(byte[] bytes) {
+        ByteArrayOutputStream arrOut = new ByteArrayOutputStream();
+        for (Byte b: Base64.getEncoder().encode(bytes)) {
+            if (b == 43) b = 45;
+            if (b == 47) b = 95;
+            arrOut.write(b);
+        }
+
+        return arrOut.toString(StandardCharsets.UTF_8);
+    }
 
     /**
      * Tests if the specified byte belongs to the Base64 schema.

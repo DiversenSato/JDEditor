@@ -3,6 +3,7 @@ package diversanto.gdmanager;
 import diversanto.gdmanager.color.Color;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
@@ -160,7 +161,8 @@ public class Level extends Constants {
         colors.add(channel);
     }
 
-    protected String storageFormat() {
+    @Override
+    public String toString() {
         StringBuilder formatted = new StringBuilder();
 
         formatted.append(String.format("<k>k2</k><s>%s</s>", name));
@@ -212,7 +214,11 @@ public class Level extends Constants {
             formatted.append(object);
         }
 
-        return formatted.toString();
+        try {
+            return Base64Functions.encode(Manager.compress(formatted.toString()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void deleteObjects() {
