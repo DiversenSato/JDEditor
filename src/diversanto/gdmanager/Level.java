@@ -54,7 +54,8 @@ public class Level extends Constants {
                             byte[] decoded = Base64Functions.decode(value.getBytes(StandardCharsets.UTF_8));
                             data = decompress(decoded);
                         }
-                        copy(data);
+                        System.out.println(data);
+                        Manager.copy(data);
 
                         //Convert data to key value pairs
                         String[] split = data.split(";");
@@ -156,6 +157,10 @@ public class Level extends Constants {
         this.speed = speed;
     }
 
+    public void addColorChannel(Color channel) {
+        colors.add(channel);
+    }
+
     protected String storageFormat() {
         StringBuilder formatted = new StringBuilder();
 
@@ -187,7 +192,7 @@ public class Level extends Constants {
 
         formatted.append("kS38,");
         for (Color color : colors) {
-            formatted.append(color.storageFormat()).append("|");
+            formatted.append(color).append("|");
         }
 
         formatted.append(",kA13,0,kA15,0,kA16,0,kA14,,");
@@ -205,7 +210,7 @@ public class Level extends Constants {
         formatted.append("kA11,0;");
 
         for (GDObject object : objects) {
-            formatted.append(object.storageFormat());
+            formatted.append(object);
         }
 
         return formatted.toString();

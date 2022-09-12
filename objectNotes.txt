@@ -1,0 +1,5 @@
+1: object id
+2: x position
+3: y position
+7: opacity
+21: color channel

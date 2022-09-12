@@ -129,7 +129,7 @@ public class Manager {
         backupOut.close();
     }
 
-    private String constructSaveFile() {
+    public String constructSaveFile() {
         StringBuilder saveFile = new StringBuilder();
         saveFile.append("<?xml version=\"1.0\"?><plist version=\"1.0\" gjver=\"2.0\"><dict><k>LLM_01</k><d><k>_isArr</k><t />");
 

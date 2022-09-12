@@ -20,7 +20,43 @@ public class HSB {
         setBrightnessToggle(Integer.parseInt(values[4]) == 1);
     }
 
-    public String storageFormat() {
+    public void setRGB(int r, int g, int b) {
+        float R = (float) r / 255f;
+        float G = (float) g / 255f;
+        float B = (float) b / 255f;
+
+        float Cmax = Math.max(Math.max(R, G), B);
+        float Cmin = Math.min(Math.min(R, G), B);
+
+        float delta = Cmax - Cmin;
+
+        //Calculate hue
+        if (delta == 0) {
+            hue = 0;
+        } else if (Cmax == R) {
+            hue = (int)(60 * (((G - B) / delta) % 6));
+        } else if (Cmax == G) {
+            hue = (int)(60 * ((B - R) / delta + 2));
+        } else if (Cmax == B) {
+            hue = (int) (60 * ((R - G) / delta + 4));
+        }
+
+        //Calculate saturation
+        if (Cmax == 0) {
+            saturation = 0;
+        } else {
+            saturation = (int)(delta / Cmax);
+        }
+
+        brightness = (int)(Cmax * 255);
+    }
+
+    public void setRGB(int a) {
+        setRGB(a, a, a);
+    }
+
+    @Override
+    public String toString() {
         String out = "";
 
         out += Color.formatFloat(hue) + "a";

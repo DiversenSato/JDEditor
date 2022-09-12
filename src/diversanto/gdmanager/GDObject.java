@@ -1,11 +1,16 @@
 package diversanto.gdmanager;
 
+import diversanto.gdmanager.color.Color;
+import diversanto.gdmanager.color.HSB;
+
 public class GDObject {
     private int id = 0;
     private int x = 0;
     private int y = 0;
     private int rotationAngle = 0;
+    private int colorChannel = -1;
     private String text = null;
+    private HSB hsb = null;
     private int noGlow = 0;
 
     public GDObject(int id, int x, int y) {
@@ -18,14 +23,17 @@ public class GDObject {
      * Converts this GD object to the string representation used by GD to store levels.
      * @return the formatted object.
      */
-    protected String storageFormat() {
+    @Override
+    public String toString() {
         StringBuilder formatted = new StringBuilder();
 
         formatted.append("1," + id + ",");
         formatted.append("2," + x + ",");
         formatted.append("3," + y + ",");
         if (rotationAngle != 0) formatted.append("6," + rotationAngle + ",");
+        if (colorChannel != -1) formatted.append("21," + colorChannel + ",");
         if (text != null) formatted.append("31," + Base64Functions.encode(text) + ",");
+        if (hsb != null) formatted.append("41,1,43," + hsb + ",");
         if (noGlow == 1) formatted.append("96,1,");
 
         formatted.append(";");
@@ -38,6 +46,18 @@ public class GDObject {
 
     public void setNoGlow() {
         noGlow = 1;
+    }
+
+    public void setColorChannel(int colorChannel) {
+        this.colorChannel = colorChannel;
+    }
+    public void setColorChannel(Color colorChannel) {
+        this.colorChannel = colorChannel.getChannel();
+    }
+
+    public HSB getHSB() {
+        if (hsb == null) hsb = new HSB();
+        return hsb;
     }
 
     /**
