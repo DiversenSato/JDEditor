@@ -16,6 +16,7 @@ public class Level extends Constants {
     protected String levelAuthor = "JDEditor";
     protected int officialSongID = 0;
     protected int version = 1;
+    protected int songID = -1;
     protected int secondsSpent = 0;
 
     protected int gameMode = CUBE;
@@ -57,7 +58,6 @@ public class Level extends Constants {
                             byte[] decoded = Base64Functions.decode(value.getBytes(StandardCharsets.UTF_8));
                             data = decompress(decoded);
                         }
-                        Manager.copy(data);
 
                         //Convert data to key value pairs
                         String[] split = data.split(";");
@@ -95,6 +95,7 @@ public class Level extends Constants {
                     case "k5" -> levelAuthor = value;
                     case "k8" -> officialSongID = Integer.parseInt(value);
                     case "k16" -> version = Integer.parseInt(value);
+                    case "k45" -> songID = Integer.parseInt(value);
                     case "k80" -> secondsSpent = Integer.parseInt(value);
                 }
             }
@@ -178,10 +179,11 @@ public class Level extends Constants {
         formatted.append(String.format("<k>k3</k><s>%s</s>", Base64Functions.encode(description)));
         if (hasData) formatted.append(String.format("<k>k4</k><s>%s</s>", formatData()));
         formatted.append(String.format("<k>k5</k><s>%s</s>", levelAuthor));
+        if (songID != -1) formatted.append("<k>k45</k><i>" + songID + "</i>");
         formatted.append("<k>k13</k><t />");
         formatted.append("<k>k21</k><i>2</i>");
         formatted.append(String.format("<k>k16</k><i>%s</i>", version));
-        if (hasData) formatted.append(String.format("<k>k80</k><i>%s</i>", secondsSpent));
+        if (hasData) formatted.append("<k>k80</k><i>" +  secondsSpent + "</i>");
         formatted.append("<k>k50</k><i>35</i>");
         formatted.append("<k>k47</k><t />");
         formatted.append("<k>kI1</k><r>0</r>");

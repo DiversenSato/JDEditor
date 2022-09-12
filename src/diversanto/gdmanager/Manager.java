@@ -63,6 +63,8 @@ public class Manager {
             lvlData = decompress(baseOut);
         }
 
+        copy(lvlData);
+
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document;
         try {

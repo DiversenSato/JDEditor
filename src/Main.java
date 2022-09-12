@@ -12,8 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class Main {
-    private static final Random rand = new Random();
-
     public static void main(String[] args) throws Exception {
 //        String imagePath = "C:\\Users\\diver\\Pictures\\magnus.png";
 //        BufferedImage picture = ImageIO.read(new File(imagePath));
@@ -41,8 +39,5 @@ public class Main {
 //                imageLevel.addObject(obj);
 //            }
 //        }
-
-        if (!Manager.debug) manager.save();
-        if (Manager.debug) manager.constructSaveFile();
     }
 }

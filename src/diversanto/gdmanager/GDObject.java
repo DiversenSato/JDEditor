@@ -70,7 +70,6 @@ public class GDObject {
     }
 
     protected GDObject(String data) {
-        if (Manager.debug) System.out.println(data);
         String[] keysVals = data.split(",");
 
         for (int i = 0; i < keysVals.length; i += 2) {
@@ -214,8 +213,7 @@ public class GDObject {
         if (highDetail) formatted.append("103,1,");
         if (linkedID != -1) formatted.append("108," + linkedID + ",");
 
-        if (Manager.debug) System.out.println(formatted.append("end").toString().replace(",end" , ""));
-        //formatted.append(extraData);
+        formatted.append(extraData);
         return formatted.append(";").toString().replace(",;", ";");
     }
 
