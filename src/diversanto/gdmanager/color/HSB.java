@@ -41,25 +41,27 @@ public class HSB {
             hue = (int) (60 * ((R - G) / delta + 4));
         }
 
+        if (hue > 180) hue -= 360;
+
         //Calculate saturation
         if (Cmax == 0) {
             saturation = 0;
         } else {
-            saturation = (int)(delta / Cmax);
+            saturation = (int)(delta / Cmax * 100);
         }
 
-        brightness = (int)(Cmax * 255);
+        brightness = (int)(Cmax * 100);
     }
 
-    public void setRGB(int a) {
-        setRGB(a, a, a);
+    public void setRGB(int c) {
+        setRGB((c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF);
     }
 
     @Override
     public String toString() {
         String out = "";
 
-        out += Color.formatFloat(hue) + "a";
+        out += hue + "a";
         out += Color.formatFloat(saturation) + "a";
         out += Color.formatFloat(brightness) + "a";
         out += saturationToggle + "a";

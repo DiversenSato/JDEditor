@@ -54,7 +54,6 @@ public class Level extends Constants {
                             byte[] decoded = Base64Functions.decode(value.getBytes(StandardCharsets.UTF_8));
                             data = decompress(decoded);
                         }
-                        System.out.println(data);
                         Manager.copy(data);
 
                         //Convert data to key value pairs
