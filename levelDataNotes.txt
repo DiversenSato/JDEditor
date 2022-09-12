@@ -4,7 +4,7 @@ kS38:
 	3: blue 0-255
 	4: copy playercol -1|0|1|2
 	5: blending 0|1
-	6: color channel 0-999 (>999 er reseverede)
+	6: color channel 0-999 (>999 are reserved)
 		1000: bg
 		1001: g col
 		1002: line

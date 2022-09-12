@@ -3,3 +3,7 @@
 3: y position
 7: opacity
 21: color channel
+32: scale
+41: hsb
+57: groups
+96: no glow

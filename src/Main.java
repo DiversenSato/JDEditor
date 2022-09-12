@@ -20,13 +20,15 @@ public class Main {
         col.setRGB(255, 255, 255);
         image.addColorChannel(col);
 
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                int colCH = x + y*10;
+        int resolution = 54;
+        for (int y = 0; y < resolution; y++) {
+            for (int x = 0; x < resolution; x++) {
+                int colCH = x + y*resolution;
 
-                GDObject obj = new GDObject(211, x * 30 + 285, y * 30 + 75);
+                GDObject obj = new GDObject(211, x * 3 + 285, y * 3 + 75);
+                obj.setScale(0.1f);
                 obj.setColorChannel(col);
-                obj.getHSB().setRGB(colCH);
+                obj.getHSB().setRGB(colCH / resolution);
                 image.addObject(obj);
             }
         }
