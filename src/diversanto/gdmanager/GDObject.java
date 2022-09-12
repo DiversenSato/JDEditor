@@ -18,6 +18,7 @@ public class GDObject {
     private int blue;
     private float moveTime = -1;
     private boolean touchTriggered = false;
+    private boolean showPortalLines = false;
     private boolean usePlayerCol1 = false;
     private boolean usePlayerCol2 = false;
     private boolean useBlending = false;
@@ -34,6 +35,7 @@ public class GDObject {
     private float scale = 1;
     private float opacity = -1;
     private boolean isTrigger = false;
+    private boolean useHSB = false;
     private HSB hsb = null;
     private float fadeIn = -1;
     private float fadeHold = -1;
@@ -41,6 +43,7 @@ public class GDObject {
     private HSB copyColorHSB = null;
     private int copyColorChannel = -1;
     private int targetGroupID = -1;
+    private int teleportDistance = 100;
     private final ArrayList<Integer> groups = new ArrayList<>();
     private boolean lockPlayerX = false;
     private boolean lockPlayerY = false;
@@ -55,6 +58,8 @@ public class GDObject {
     private int xOrY = 0;
     private boolean highDetail = false;
     private int linkedID = -1;
+
+    private String extraData = "";
 
     public GDObject(int id, int x, int y) {
         this.id = id;
@@ -73,6 +78,7 @@ public class GDObject {
             String value = keysVals[i+1];
 
             switch (key) {
+                default -> extraData += key + "," + value + ",";
                 case 1 -> id = Integer.parseInt(value);
                 case 2 -> x = Float.parseFloat(value);
                 case 3 -> y = Float.parseFloat(value);
@@ -84,6 +90,7 @@ public class GDObject {
                 case 9 -> green = Integer.parseInt(value);
                 case 10 -> moveTime = Float.parseFloat(value);
                 case 11 -> touchTriggered = true;
+                case 13 -> showPortalLines = true;
                 case 15 -> usePlayerCol1 = true;
                 case 16 -> usePlayerCol2 = true;
                 case 17 -> useBlending = true;
@@ -99,12 +106,15 @@ public class GDObject {
                 case 32 -> scale = Float.parseFloat(value);
                 case 35 -> opacity = Float.parseFloat(value);
                 case 36 -> isTrigger = true;
+                case 41 -> useHSB = true;
+                case 43 -> hsb = new HSB(value);
                 case 45 -> fadeIn = Float.parseFloat(value);
                 case 46 -> fadeHold = Float.parseFloat(value);
                 case 47 -> fadeOut = Float.parseFloat(value);
                 case 49 -> copyColorHSB = new HSB(value);
                 case 50 -> copyColorChannel = Integer.parseInt(value);
                 case 51 -> targetGroupID = Integer.parseInt(value);
+                case 54 -> teleportDistance = Integer.parseInt(value);
                 case 57 -> {
                     for (String g : value.split("\\.")) {
                         groups.add(Integer.parseInt(g));
@@ -153,6 +163,7 @@ public class GDObject {
             formatted.append("30," + easingMode + ",");
         }
         if (touchTriggered) formatted.append("11,1,");
+        if (showPortalLines) formatted.append("13,1,");
         if (usePlayerCol1) formatted.append("15,1,");
         if (usePlayerCol2) formatted.append("16,1,");
         if (useBlending) formatted.append("17,1,");
@@ -175,6 +186,7 @@ public class GDObject {
             formatted.append("49," + copyColorHSB + ",");
         }
         if (targetGroupID != -1) formatted.append("51," + targetGroupID + ",");
+        if (id == 747) formatted.append("54," + teleportDistance + ",");
 
         if (groups.size() == 1) {
             formatted.append("57,").append(groups.get(0)).append(",");
@@ -203,6 +215,7 @@ public class GDObject {
         if (linkedID != -1) formatted.append("108," + linkedID + ",");
 
         if (Manager.debug) System.out.println(formatted.append("end").toString().replace(",end" , ""));
+        //formatted.append(extraData);
         return formatted.append(";").toString().replace(",;", ";");
     }
 

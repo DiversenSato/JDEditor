@@ -16,8 +16,8 @@ public class HSB {
         setHue(Integer.parseInt(values[0]));
         setSaturation(Float.parseFloat(values[1]));
         setBrightness(Float.parseFloat(values[2]));
-        setSaturationToggle(Integer.parseInt(values[3]) == 1);
-        setBrightnessToggle(Integer.parseInt(values[4]) == 1);
+        saturationToggle = (values[3].equals("1") ? 1 : 0);
+        brightnessToggle = (values[4].equals("1") ? 1 : 0);
     }
 
     public void setRGB(int r, int g, int b) {
@@ -47,10 +47,10 @@ public class HSB {
         if (Cmax == 0) {
             saturation = 0;
         } else {
-            saturation = (int)(delta / Cmax * 100);
+            saturation = delta / Cmax;
         }
 
-        brightness = (int)(Cmax * 100);
+        brightness = Cmax;
     }
 
     public void setRGB(int c) {
@@ -85,9 +85,9 @@ public class HSB {
     }
     public void setSaturation(float saturation) {
         if (saturationToggle == 1) {
-            this.saturation = Math.min(Math.max(-100, saturation), 100);
+            this.saturation = Math.min(Math.max(-1, saturation), 1);
         } else {
-            this.saturation = Math.min(Math.max(0, saturation), 200);
+            this.saturation = Math.min(Math.max(0, saturation), 2);
         }
     }
 
@@ -98,9 +98,9 @@ public class HSB {
     }
     public void setBrightness(float brightness) {
         if (brightnessToggle == 1) {
-            this.brightness = Math.min(Math.max(-100, brightness), 100);
+            this.brightness = Math.min(Math.max(-1, brightness), 1);
         } else {
-            this.brightness = Math.min(Math.max(0, brightness), 200);
+            this.brightness = Math.min(Math.max(0, brightness), 2);
         }
     }
 
@@ -112,10 +112,10 @@ public class HSB {
     public void setSaturationToggle(boolean saturationToggle) {
         if (saturationToggle) {
             this.saturationToggle = 1;
-            saturation -= 100;
+            saturation -= 1;
         } else {
             this.saturationToggle = 0;
-            saturation += 100;
+            saturation += 1;
         }
     }
 
@@ -127,10 +127,10 @@ public class HSB {
     public void setBrightnessToggle(boolean brightnessToggle) {
         if (brightnessToggle) {
             this.brightnessToggle = 1;
-            brightness -= 100;
+            brightness -= 1;
         } else {
             this.brightnessToggle = 0;
-            brightness += 100;
+            brightness += 1;
         }
     }
 }

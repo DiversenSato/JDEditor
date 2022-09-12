@@ -1,9 +1,121 @@
-1: object id
-2: x position
-3: y position
-7: opacity
-21: color channel
-32: scale
-41: hsb
-57: groups
-96: no glow
+1: id | int
+
+2: x pos | float
+
+3: y pos | float
+
+4: flip horizontally | boolean
+
+5: flip vertically | boolean
+
+6: rotation | int
+
+7: Red | int
+
+8: Green | int
+
+9: Blue | int
+
+10: Move time | float
+
+11: Touch triggered | boolean
+
+13: Show portal lines / speed changes | boolean
+
+15: usePlayerCol1 | boolean
+
+16: usePlayerCol2 | boolean
+
+17: blending | boolean
+
+20: Editor layer 1 | int (default = 0)
+
+21: Base color | int (null = default)
+
+22: Detail color | int (null = default)
+
+23: colorTargetID | int
+
+24: zLayer | int
+	B4: -3
+	B3: -1
+	B2: 1
+	B1: 3
+	T1: 5
+	T2: 7
+	T3: 9
+	Default: null
+
+25: zOrder | int
+
+28: moveX | int
+
+29: moveY | int
+
+30: Easing | int
+
+31: Text | String
+
+32: Scale | float
+
+34: Group parent | boolean
+
+35: Opacity | float
+
+36: is trigger | boolean
+
+41: Use HSV | boolean
+
+43: HSV value | HSB
+
+45: fadeIn | float
+
+46: fadeHold | float
+
+47: fadeOut | float
+
+49: copy color hsb | HSB
+
+50: copy color channel | int
+
+51: Target groupID | int
+
+54: teleportDistance | int
+
+56: Activate group | boolean
+
+57: Groups | int[] (Format: "1" or "1.2.5")
+
+58: Lock player x | boolean
+
+59: Lock player y | boolean
+
+61: Editor layer 2 | int (null = 0)
+
+62: Spawn triggered | boolean
+
+63: Delay | float
+
+64: Don't fade | boolean
+
+67: Don't enter | boolean
+
+71: Target pos groupID | int
+
+85: easing rate | float
+
+87: Multi trigger | boolean
+
+96: No glow | boolean
+
+99: Allow multi activate | boolean
+
+100: use target | boolean
+
+101: X or y only | int (0-2)
+
+102: Editor disable | boolean
+
+103: High detail | boolean
+
+108: linked object id | int
