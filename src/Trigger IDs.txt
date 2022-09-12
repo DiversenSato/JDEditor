@@ -1,0 +1,3 @@
+899: Color trigger
+901: Move trigger
+1006: Pulse trigger
