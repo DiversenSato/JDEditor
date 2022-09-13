@@ -40,10 +40,10 @@ public class GDObject {
     private float fadeIn = -1;
     private float fadeHold = -1;
     private float fadeOut = -1;
-    private HSB copyColorHSB = null;
+    private HSB copyColorHSB = new HSB();
     private int copyColorChannel = -1;
     private int targetGroupID = -1;
-    private int teleportDistance = 100;
+    private float teleportDistance = 100;
     private final ArrayList<Integer> groups = new ArrayList<>();
     private boolean lockPlayerX = false;
     private boolean lockPlayerY = false;
@@ -85,8 +85,8 @@ public class GDObject {
                 case 5 -> flipVertically = true;
                 case 6 -> rotation = Integer.parseInt(value);
                 case 7 -> red = Integer.parseInt(value);
-                case 8 -> blue = Integer.parseInt(value);
-                case 9 -> green = Integer.parseInt(value);
+                case 8 -> green = Integer.parseInt(value);
+                case 9 -> blue = Integer.parseInt(value);
                 case 10 -> moveTime = Float.parseFloat(value);
                 case 11 -> touchTriggered = true;
                 case 13 -> showPortalLines = true;
@@ -110,10 +110,10 @@ public class GDObject {
                 case 45 -> fadeIn = Float.parseFloat(value);
                 case 46 -> fadeHold = Float.parseFloat(value);
                 case 47 -> fadeOut = Float.parseFloat(value);
-                case 49 -> copyColorHSB = new HSB(value);
+                case 49 -> copyColorHSB.formatFrom(value);
                 case 50 -> copyColorChannel = Integer.parseInt(value);
                 case 51 -> targetGroupID = Integer.parseInt(value);
-                case 54 -> teleportDistance = Integer.parseInt(value);
+                case 54 -> teleportDistance = Float.parseFloat(value);
                 case 57 -> {
                     for (String g : value.split("\\.")) {
                         groups.add(Integer.parseInt(g));
@@ -226,6 +226,17 @@ public class GDObject {
         return true;
     }
 
+    public boolean hasGroupID(int g) {
+        for (Integer i : groups) {
+            if (i == g) return true;
+        }
+
+        if (targetGroupID == g) return true;
+        if (targetPosID == g) return true;
+
+        return false;
+    }
+
     public void setRotation(int angle) {
         rotation = angle;
     }
@@ -262,5 +273,9 @@ public class GDObject {
         GDObject newText = new GDObject(914, x, y);
         newText.text = text;
         return newText;
+    }
+
+    public void setEditorLayer(int layer) {
+        editorLayer1 = layer;
     }
 }

@@ -2,16 +2,20 @@ package diversanto.gdmanager.color;
 
 public class HSB {
     private int hue = 0;
-    private float saturation = 100;
-    private float brightness = 100;
+    private float saturation = 1;
+    private float brightness = 1;
     private int saturationToggle = 0;
     private int brightnessToggle = 0;
 
     public HSB() {}
 
     public HSB(String data) {
+        formatFrom(data);
+    }
+
+    public void formatFrom(String data) {
         String[] values = data.split("a");
-        if (values.length != 5) throw new NumberFormatException("HSB string data must have 5 values!");
+        if (values.length != 5) throw new NumberFormatException("HSB string data must have 5 values: " + data);
 
         setHue(Integer.parseInt(values[0]));
         setSaturation(Float.parseFloat(values[1]));

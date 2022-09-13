@@ -1,13 +1,14 @@
 package diversanto.gdmanager;
 
 import diversanto.gdmanager.color.Color;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import static diversanto.gdmanager.Manager.copy;
 import static diversanto.gdmanager.Manager.decompress;
 
 public class Level extends Constants {
@@ -15,9 +16,9 @@ public class Level extends Constants {
     protected String description = "Created using JDEditor";
     protected String levelAuthor = "JDEditor";
     protected int officialSongID = 0;
-    protected int version = 1;
+    protected int version = -1;
     protected int songID = -1;
-    protected int secondsSpent = 0;
+    protected int secondsSpent = -1;
 
     protected int gameMode = CUBE;
     protected boolean mini = false;
@@ -35,18 +36,24 @@ public class Level extends Constants {
     private final ArrayList<GDObject> objects = new ArrayList<>();
     private boolean hasData = false;
 
-
+    private String extraData = "";
 
     protected Level(NodeList dataList, boolean isEncoded) throws Exception {
         int rawByteLength = -1;
 
-        for (int i = 0; i < dataList.getLength(); i++) {
+        for (int i = 0; i < dataList.getLength(); i += 2) {
             if (dataList.item(i).getNodeName().equals("k")) {
-                String key = dataList.item(i++).getTextContent();
-                String value = dataList.item(i).getTextContent();
+                String key = dataList.item(i).getTextContent();
+                String value = dataList.item(i+1).getTextContent();
 
                 switch (key) {
-                    case "k2" -> name = value;
+                    default -> {
+                        extraData += elementToString((Element)dataList.item(i));
+                        extraData += elementToString((Element)dataList.item(i+1));
+                    }
+                    case "k2" -> {
+                        name = value;
+                    }
                     case "k3" -> {
                         if (isEncoded) description = new String(Base64Functions.decode(value.getBytes()), StandardCharsets.UTF_8);
                         else description = value;
@@ -171,6 +178,52 @@ public class Level extends Constants {
         colors.add(channel);
     }
 
+    public int nextFreeGroup() {
+        boolean foundMatch = false;
+        int i = 1;
+        while(i < 999 && !foundMatch) {  //Loop through every possible ID
+            foundMatch = true;
+
+            //If any objects has this id, skip
+            for (GDObject o : objects) {
+                if (o.hasGroupID(i)) {
+                    foundMatch = false;
+
+                    i++;
+                    break;
+                }
+            }
+        }
+
+        return i;
+    }
+
+    public void deleteGroup(int g) {
+        for (int i = objects.size()-1; i >= 0; i--) {
+            if (objects.get(i).hasGroupID(g)) objects.remove(i);
+        }
+    }
+
+    public int nextFreeColorChannel() {
+        boolean foundMatch = false;
+        int i = 1;
+        while(i < 999 && !foundMatch) {  //Loop through every possible ID
+            foundMatch = true;
+
+            //If any objects has this id, skip
+            for (Color c : colors) {
+                if (c.getChannel() == i) {
+                    foundMatch = false;
+
+                    i++;
+                    break;
+                }
+            }
+        }
+
+        return i;
+    }
+
     @Override
     public String toString() {
         StringBuilder formatted = new StringBuilder();
@@ -180,21 +233,9 @@ public class Level extends Constants {
         if (hasData) formatted.append(String.format("<k>k4</k><s>%s</s>", formatData()));
         formatted.append(String.format("<k>k5</k><s>%s</s>", levelAuthor));
         if (songID != -1) formatted.append("<k>k45</k><i>" + songID + "</i>");
-        formatted.append("<k>k13</k><t />");
-        formatted.append("<k>k21</k><i>2</i>");
-        formatted.append(String.format("<k>k16</k><i>%s</i>", version));
-        if (hasData) formatted.append("<k>k80</k><i>" +  secondsSpent + "</i>");
-        formatted.append("<k>k50</k><i>35</i>");
-        formatted.append("<k>k47</k><t />");
-        formatted.append("<k>kI1</k><r>0</r>");
-        formatted.append("<k>kI2</k><r>36</r>");
-        formatted.append("<k>kI3</k><r>1</r>");
-
-        formatted.append("<k>kI6</k><d>");
-        for (int i = 0; i < 12; i++) {
-            formatted.append(String.format("<k>%d</k><s>0</s>", i));
-        }
-        formatted.append("</d>");
+        if (version != -1) formatted.append(String.format("<k>k16</k><i>%s</i>", version));
+        if (secondsSpent != -1) formatted.append("<k>k80</k><i>" +  secondsSpent + "</i>");
+        formatted.append(extraData);
 
         return formatted.toString();
     }
@@ -234,5 +275,27 @@ public class Level extends Constants {
 
     public void deleteObjects() {
         objects.clear();
+    }
+
+    public static String elementToString(Element n) {
+        StringBuilder out = new StringBuilder();
+
+        int childLength = n.getChildNodes().getLength();
+        if (n.getNodeType() == Node.ELEMENT_NODE) {
+            String nodeName = n.getNodeName();
+            out.append("<").append(nodeName).append(">");
+
+            for (int i = 0; i < n.getChildNodes().getLength(); i++) {
+                Node child = n.getChildNodes().item(i);
+                if (child.getNodeType() == Node.ELEMENT_NODE) out.append(elementToString((Element)child));
+                else if (child.getNodeType() == Node.TEXT_NODE) out.append(child.getTextContent());
+            }
+
+            out.append("</").append(nodeName).append(">");
+        } else if (n.getNodeType() == Node.TEXT_NODE) {
+            return n.getTextContent();
+        }
+
+        return out.toString();
     }
 }

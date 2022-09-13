@@ -39,6 +39,7 @@ public class Manager {
             backupStream.close();
         } catch (IOException e) {
             System.err.println("An error occurred while attempting to create the backup");
+            e.printStackTrace();
         }
 
         String lvlData = new String(rawFile, StandardCharsets.UTF_8);
@@ -63,7 +64,7 @@ public class Manager {
             lvlData = decompress(baseOut);
         }
 
-        copy(lvlData);
+        //copy(lvlData);
 
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document;
@@ -157,7 +158,7 @@ public class Manager {
         saveFile.append("<?xml version=\"1.0\"?><plist version=\"1.0\" gjver=\"2.0\"><dict><k>LLM_01</k><d><k>_isArr</k><t />");
 
         for (int i = 0; i < levels.size(); i++) {
-            String lvlEntry = String.format("<k>k_%d</k><d><k>kCEK</k><i>4</i>%s</d>", i, levels.get(i));
+            String lvlEntry = String.format("<k>k_%d</k><d>%s</d>", i, levels.get(i));
             saveFile.append(lvlEntry);
         }
         saveFile.append("</d><k>LLM_02</k><i>35</i></dict></plist>");

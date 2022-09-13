@@ -7,9 +7,8 @@ public class Color {
     private int copyPlayerCol = -1;
     private boolean blending = false;
     private int colorChannel = 1000;
-    private float opacity = 100;
-    private int copyColorChannel = 1;
-    private boolean useColorCopy = false;
+    private float opacity = 1;
+    private int copyColorChannel = -1;
     private HSB hsb = new HSB();
 
     public Color(String data) {
@@ -26,14 +25,8 @@ public class Color {
                 case 5 -> blending = Integer.parseInt(value) == 1;
                 case 6 -> colorChannel = Integer.parseInt(value);
                 case 7 -> opacity = Float.parseFloat(value);
-                case 9 -> {
-                    useColorCopy = true;
-                    copyColorChannel = Integer.parseInt(value);
-                }
-                case 10 -> {
-                    useColorCopy = true;
-                    hsb = new HSB(value);
-                }
+                case 9 -> copyColorChannel = Integer.parseInt(value);
+                case 10 -> hsb = new HSB(value);
             }
         }
     }
@@ -55,7 +48,7 @@ public class Color {
         if (blending) out += "5_1_";
         out += "7_" + opacity + "_";
         out += "15_1_";
-        if (useColorCopy) {
+        if (copyColorChannel != -1) {
             out += "9_" + copyColorChannel + "_";
             out += "10_" + hsb + "_";
         }
