@@ -40,7 +40,7 @@ Level Data:
     kA10 (two-player mode): 0|1
     kA11 0
     kA13 0
-    kA14
+    kA14 (guide lines)
     kA15 0
     kA16 0
     kA17 (line): 1|2

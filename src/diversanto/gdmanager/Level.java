@@ -5,6 +5,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -119,6 +120,11 @@ public class Level extends Constants {
         colors.add(new Color("1_255_2_255_3_255_11_255_12_255_13_255_6_1002_5_1_7_1_15_1_18_0_8_1"));
         colors.add(new Color("1_255_2_255_3_255_11_255_12_255_13_255_6_1005_5_1_7_1_15_1_18_0_8_1"));
         colors.add(new Color("1_255_2_185_3_0_11_255_12_255_13_255_6_1006_5_1_7_1_15_1_18_0_8_1"));
+
+        extraData += "<k>kCEK</k><i>4</i>";
+        extraData += "<k>k21</k><i>2</i>";
+        extraData += "<k>k50</k><i>35</i>";
+        extraData += "<k>k47</k><t/>";
     }
 
     public Color getColor(int colorChannel) {
@@ -129,11 +135,25 @@ public class Level extends Constants {
         return null;
     }
 
-    public GDObject addObject(int id, int x, int y) {
+    public GDObject addObject(int id, float x, int y) {
         GDObject newObj = new GDObject(id, x, y);
         objects.add(newObj);
         hasData = true;
         return newObj;
+    }
+
+    public Point2D.Float getLastObjectPosition() {
+        if (objects.size() > 0) {
+            GDObject last = objects.get(0);
+
+            for (GDObject o : objects) {
+                if (o.getPosition().x > last.getPosition().x) last = o;
+            }
+
+            return last.getPosition();
+        } else {
+            return new Point2D.Float(15, 15);
+        }
     }
 
     public void addObject(GDObject o) {
@@ -297,5 +317,9 @@ public class Level extends Constants {
         }
 
         return out.toString();
+    }
+
+    public int getObjectCount() {
+        return objects.size();
     }
 }

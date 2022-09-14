@@ -3,6 +3,8 @@ package diversanto.gdmanager;
 import diversanto.gdmanager.color.Color;
 import diversanto.gdmanager.color.HSB;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 public class GDObject {
@@ -61,7 +63,7 @@ public class GDObject {
 
     private String extraData = "";
 
-    public GDObject(int id, int x, int y) {
+    public GDObject(int id, float x, float y) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -73,7 +75,12 @@ public class GDObject {
         String[] keysVals = data.split(",");
 
         for (int i = 0; i < keysVals.length; i += 2) {
-            int key = Integer.parseInt(keysVals[i]);
+            int key = 0;
+            try {
+                key = Integer.parseInt(keysVals[i]);
+            } catch (NumberFormatException e) {
+                continue;
+            }
             String value = keysVals[i+1];
 
             switch (key) {
@@ -235,6 +242,10 @@ public class GDObject {
         if (targetPosID == g) return true;
 
         return false;
+    }
+
+    public Point2D.Float getPosition() {
+        return new Point2D.Float(x, y);
     }
 
     public void setRotation(int angle) {
