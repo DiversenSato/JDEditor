@@ -64,7 +64,7 @@ public class Manager {
             lvlData = decompress(baseOut);
         }
 
-        //copy(lvlData);
+        copy(lvlData);
 
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document;
@@ -101,6 +101,24 @@ public class Manager {
             }
         }
 
+        return null;
+    }
+    /**
+     * Fetches a level by searching for the name.
+     * If the level does not exist, either a new level or null will be returned.
+     * The second parameter controls, if the should be created if it does not exist.
+     * @param levelName The name of the level.
+     * @param createMode Whether the level should be created if it does not exist.
+     * @return the level.
+     */
+    public Level getLevel(String levelName, boolean createMode) {
+        for (Level level : levels) {
+            if (level.name.equals(levelName)) {
+                return level;
+            }
+        }
+
+        if (createMode) return createLevel(levelName);
         return null;
     }
 
@@ -235,6 +253,7 @@ public class Manager {
      * @param theString to be copied.
      */
     public static void copy(String theString) {
+        System.out.println("Copied string");
         StringSelection selection = new StringSelection(theString);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, selection);

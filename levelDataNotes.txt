@@ -5,8 +5,14 @@ Level Information:
     k5: Level author
     k8: Official song ID
     k16: Version
+    k42: Original level ID (If this level was copied)
     k45: Song ID
+    k50: Binary version
     k80: Seconds in editor
+    kI1: World x (basically means negative cam x)
+    kI2: World y (basically means negative cam y)
+    kI3: Editor zoom (Bigger is more zoomed in)
+    kI6: ????????? (contains keys from 0-12, but all the values are <s>0</s>)
 
 Level Data:
     kS38:
@@ -60,13 +66,3 @@ Level Data:
     kS38,1_40_2_125_3_255_11_255_12_255_13_255_4_1_6_1000_7_1_ 15_1_ 9_2_  10_0a1.16a1a0a0_ 18_0_8_1|
     kS38,1_40_2_125_3_255_11_255_12_255_13_255_4_1_6_1000_7_1_ 15_1_ 9_69_ 10_0a1.16a1a0a0_ 18_0_8_1|
     kS38,1_40_2_125_3_255_11_255_12_255_13_255_4_1_6_1000_7_1_ 15_1_       10_0a1.16a1a0a0_ 18_0_8_1|
-
-
-
-
-
-
-    kI1: maybe editor x (inverted???)
-    kI2: maybe editor y
-    kI3: editor zoom
-    kI6: ????????? (contains keys from 0-12, but all the values are <s>0</s>)

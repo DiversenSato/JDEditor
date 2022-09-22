@@ -5,7 +5,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -18,8 +21,15 @@ public class Level extends Constants {
     protected String levelAuthor = "JDEditor";
     protected int officialSongID = 0;
     protected int version = -1;
+    protected int binaryVersion = 35;
     protected int songID = -1;
+    protected int originalLevelID = -1;
     protected int secondsSpent = -1;
+    protected float worldX = 0;
+    protected float worldY = 0;
+    protected float zoom = 0;
+
+
 
     protected int gameMode = CUBE;
     protected boolean mini = false;
@@ -30,6 +40,12 @@ public class Level extends Constants {
     protected boolean twoPlayer = false;
     protected int lineType = 0;
     protected int font = 0;
+
+    protected boolean k13 = false;
+    protected int k21 = 2;
+    protected boolean k47 = false;
+    protected int k81 = -1;
+    protected String kI6 = null;
 
 
 
@@ -48,10 +64,7 @@ public class Level extends Constants {
                 String value = dataList.item(i+1).getTextContent();
 
                 switch (key) {
-                    default -> {
-                        extraData += elementToString((Element)dataList.item(i));
-                        extraData += elementToString((Element)dataList.item(i+1));
-                    }
+                    case "kCEK" -> {}
                     case "k2" -> {
                         name = value;
                     }
@@ -102,9 +115,26 @@ public class Level extends Constants {
                     }
                     case "k5" -> levelAuthor = value;
                     case "k8" -> officialSongID = Integer.parseInt(value);
+                    case "k13" -> k13 = true;
                     case "k16" -> version = Integer.parseInt(value);
+                    case "k21" -> k21 = Integer.parseInt(value);
+                    case "k42" -> originalLevelID = Integer.parseInt(value);
                     case "k45" -> songID = Integer.parseInt(value);
+                    case "k47" -> k47 = true;
+                    case "k50" -> binaryVersion = Integer.parseInt(value);
                     case "k80" -> secondsSpent = Integer.parseInt(value);
+                    case "k81" -> k81 = Integer.parseInt(value);
+                    case "kI1" -> worldX = Float.parseFloat(value);
+                    case "kI2" -> worldY = Float.parseFloat(value);
+                    case "kI3" -> zoom = Float.parseFloat(value);
+                    case "kI6" -> {
+                        kI6 = elementToString((Element)dataList.item(i+1));
+                    }
+                    default -> {
+                        System.out.println("Unserialized key: " + key);
+                        extraData += elementToString((Element)dataList.item(i));
+                        extraData += elementToString((Element)dataList.item(i+1));
+                    }
                 }
             }
         }
@@ -121,12 +151,16 @@ public class Level extends Constants {
         colors.add(new Color("1_255_2_255_3_255_11_255_12_255_13_255_6_1005_5_1_7_1_15_1_18_0_8_1"));
         colors.add(new Color("1_255_2_185_3_0_11_255_12_255_13_255_6_1006_5_1_7_1_15_1_18_0_8_1"));
 
-        extraData += "<k>kCEK</k><i>4</i>";
         extraData += "<k>k21</k><i>2</i>";
         extraData += "<k>k50</k><i>35</i>";
         extraData += "<k>k47</k><t/>";
     }
 
+    /**
+     * Finds the color that uses the specified channel ID and returns it.
+     * @param colorChannel The color channel ID
+     * @return The color
+     */
     public Color getColor(int colorChannel) {
         for (Color color : colors) {
             if (color.getChannel() == colorChannel) return color;
@@ -135,6 +169,13 @@ public class Level extends Constants {
         return null;
     }
 
+    /**
+     * Adds a new empty object to this level. The ID, x and y values can be specified.
+     * @param id The object ID
+     * @param x The x position
+     * @param y The y position
+     * @return The newly created GDObject
+     */
     public GDObject addObject(int id, float x, int y) {
         GDObject newObj = new GDObject(id, x, y);
         objects.add(newObj);
@@ -142,6 +183,19 @@ public class Level extends Constants {
         return newObj;
     }
 
+    /**
+     * Adds a GDObject to this level.
+     * @param o The new object
+     */
+    public void addObject(GDObject o) {
+        objects.add(o);
+        hasData = true;
+    }
+
+    /**
+     * Returns the position of the last object in this level. Use Point2D.x or Point2D.y to get their respective values.
+     * @return The last position
+     */
     public Point2D.Float getLastObjectPosition() {
         if (objects.size() > 0) {
             GDObject last = objects.get(0);
@@ -156,11 +210,10 @@ public class Level extends Constants {
         }
     }
 
-    public void addObject(GDObject o) {
-        objects.add(o);
-        hasData = true;
-    }
-
+    /**
+     * returns the name of this level
+     * @return The level name
+     */
     public String getName() {
         if (name == null) {
             name = "Level name";
@@ -169,15 +222,18 @@ public class Level extends Constants {
         return name;
     }
 
-    public boolean setDescription(String desc) {
-        if (desc.length() <= 140) {
-            description = desc;
-            return true;
-        }
-
-        return false;
+    /**
+     * Sets the description of this level.
+     * @param desc The new description
+     */
+    public void setDescription(String desc) {
+        description = desc;
     }
 
+    /**
+     * Simply returns the description of this level.
+     * @return The description
+     */
     public String getDescription() {
         if (description == null) {
             description = "Description";
@@ -186,18 +242,37 @@ public class Level extends Constants {
         return description;
     }
 
+    /**
+     * Sets the starting game mode of this level.
+     * Please note that gdmanager.Constants contains constants representing the different game modes.
+     * @param gameMode The game mode
+     */
     public void setGameMode(int gameMode) {
         this.gameMode = gameMode;
     }
 
+    /**
+     * Sets the starting speed for this level.
+     * Please note that gdmanager.Constants contains constants representing the different speeds. This is because the numbering order is a bit weird, so please use those.
+     * @param speed The speed
+     */
     public void setSpeed(int speed) {
         this.speed = speed;
     }
 
-    public void addColorChannel(Color channel) {
-        colors.add(channel);
+    /**
+     * Adds the given color channel to this level.
+     * There currently is no limit to the channel ID and I don't intend finding out what happens when you go over 1009
+     * @param color The color object
+     */
+    public void addColorChannel(Color color) {
+        colors.add(color);
     }
 
+    /**
+     * Scans the used group IDs and finds a free group.
+     * @return The group ID
+     */
     public int nextFreeGroup() {
         boolean foundMatch = false;
         int i = 1;
@@ -218,12 +293,20 @@ public class Level extends Constants {
         return i;
     }
 
+    /**
+     * Removes all objects containing the given group ID.
+     * @param g The group ID
+     */
     public void deleteGroup(int g) {
         for (int i = objects.size()-1; i >= 0; i--) {
             if (objects.get(i).hasGroupID(g)) objects.remove(i);
         }
     }
 
+    /**
+     * Scans the color channels and finds a free id.
+     * @return The color channel ID
+     */
     public int nextFreeColorChannel() {
         boolean foundMatch = false;
         int i = 1;
@@ -244,18 +327,48 @@ public class Level extends Constants {
         return i;
     }
 
+    /**
+     * Converts this level to something that goes in the save file.
+     * This is used internally to save levels, so you don't have to worry about this method.
+     * I can't stop you though ;)
+     * @return The string representation of this level
+     */
     @Override
     public String toString() {
+        //Fix object density
+        int objectCount = getObjectCount();
+        float minLastX = (float)objectCount / 115f * 30f;  //115 is the amount of objects per block. This may differ; I have no idea how this works other than it won't start the level with this.
+        if (minLastX > getLastObjectPosition().x) {  //Also, the actual value is closer to 115,843.
+            addObject(1, minLastX, 2100);
+            System.out.println(name + " was expanded to fix object density errors at x = " + minLastX);
+        }
+
+
+
         StringBuilder formatted = new StringBuilder();
 
+        formatted.append("<k>kCEK</k><i>4</i>");
         formatted.append(String.format("<k>k2</k><s>%s</s>", name));
         formatted.append(String.format("<k>k3</k><s>%s</s>", Base64Functions.encode(description)));
         if (hasData) formatted.append(String.format("<k>k4</k><s>%s</s>", formatData()));
         formatted.append(String.format("<k>k5</k><s>%s</s>", levelAuthor));
-        if (songID != -1) formatted.append("<k>k45</k><i>" + songID + "</i>");
-        if (version != -1) formatted.append(String.format("<k>k16</k><i>%s</i>", version));
+        formatted.append("<k>k13</k><t/>");
+        formatted.append("<k>k21</k><i>").append(k21).append("</i>");
+        if (version != -1) formatted.append("<k>k16</k><i>").append(version).append("</i>");
         if (secondsSpent != -1) formatted.append("<k>k80</k><i>" +  secondsSpent + "</i>");
+        if (k81 != -1) formatted.append("<k>k81</k><i>").append(k81).append("</i>");
+        if (originalLevelID != -1) formatted.append("<k>k42</k><i>" + originalLevelID + "</i>");
+        if (songID != -1) formatted.append("<k>k45</k><i>" + songID + "</i>");
+        if (k47) formatted.append("<k>k47</k><t />");
+        formatted.append("<k>k50</k><i>").append(binaryVersion).append("</i>");
         formatted.append(extraData);
+
+        formatted.append("<k>kI1</k><r>").append(worldX).append("</r>");
+        formatted.append("<k>kI2</k><r>").append(worldY).append("</r>");
+        formatted.append("<k>kI3</k><r>").append(zoom).append("</r>");
+        formatted.append("<k>kI6</k>");
+        if (kI6 != null) formatted.append(kI6);
+        else formatted.append("<d />");
 
         return formatted.toString();
     }
@@ -293,8 +406,19 @@ public class Level extends Constants {
         }
     }
 
+    /**
+     * Removes all objects from this level.
+     */
     public void deleteObjects() {
         objects.clear();
+    }
+
+    /**
+     * Resets the given level so all it's data is removed. This includes gamemodes, level data, name and so on.
+     * @param lvl The level to be resat
+     */
+    public static void reset(Level lvl) {
+        lvl = new Level(lvl.name);
     }
 
     public static String elementToString(Element n) {
@@ -319,7 +443,74 @@ public class Level extends Constants {
         return out.toString();
     }
 
+    /**
+     * Counts the amount of objects in this level.
+     * @return The object count
+     */
     public int getObjectCount() {
         return objects.size();
+    }
+
+
+
+    /**
+     * Will add a picture to this level.
+     * The picture, of course, is very pixelated, as increasing resolution exponentially increases object count.
+     * @param imagePath The path to the image file
+     * @param xPosition X position of the bottom left corner
+     * @param yPosition Y position of the bottom left corner
+     */
+    public void createImage(String imagePath, int xPosition, int yPosition) {
+        BufferedImage picture = null;
+
+        try {
+            picture = ImageIO.read(new File(imagePath));
+        } catch (IOException e) {
+            System.err.println("An error occurred while reading the image data. Does the specified path exist or is correctly spelled?");
+            e.printStackTrace();
+            System.out.println("Execution will continue without adding an image!");
+        }
+
+        Color col = new Color(nextFreeColorChannel());
+        col.setRGB(255, 0, 0);
+        addColorChannel(col);
+
+        assert picture != null;
+        int maxResolution = 50;
+        int pixelSize = 3;
+        float scale = (float)pixelSize / 30f;
+
+        int minResolution = maxResolution * picture.getHeight() / picture.getWidth();
+        int xRes = (picture.getHeight() < picture.getWidth()) ? maxResolution : minResolution;
+        int yRes = (picture.getHeight() > picture.getWidth()) ? maxResolution : minResolution;
+        int sampleDistance = picture.getWidth() / xRes;
+        int pictureGroup = nextFreeGroup();
+
+        for (int y = 0; y < yRes; y++) {
+            for (int x = 0; x < xRes; x++) {
+                GDObject obj = new GDObject(211, x * pixelSize + xPosition + ((int)(scale/2f)), y * -pixelSize + yRes*3 + yPosition + ((int)(scale/2f)));
+                obj.setScale(scale);
+                obj.addGroup(pictureGroup);
+                obj.setColorChannel(col);
+                obj.setEditorLayer(101);
+
+                obj.getHSB().setRGB(picture.getRGB(x * sampleDistance, y * sampleDistance));
+
+                addObject(obj);
+            }
+        }
+
+        setCameraPos(xPosition + (int)(xRes*scale / 2 * 30), yPosition + (int)(yRes*scale / 2 * 30));
+    }
+
+    /**
+     * Adjusts the camera position to look at a certain coordinate.
+     * This method is NOT 100% accurate, so don't go using this as a way to mark positions if accuracy is needed.
+     * @param x Camera x position
+     * @param y Camera y position
+     */
+    public void setCameraPos(int x, int y) {
+        worldX = (int)((-x + 285) * zoom);
+        worldY = (int)((-y + 106) * zoom);
     }
 }
