@@ -469,6 +469,7 @@ public class Level extends Constants {
             System.err.println("An error occurred while reading the image data. Does the specified path exist or is correctly spelled?");
             e.printStackTrace();
             System.out.println("Execution will continue without adding an image!");
+            return;
         }
 
         Color col = new Color(nextFreeColorChannel());
